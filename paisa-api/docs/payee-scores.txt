@@ -1,0 +1,183 @@
+164 payees, 349 debits
+all 170 already cached
+
+payee                                             n   best    gap  category
+----------------------------------------------------------------------------------------------------
+KSK HOSPITALKARTHIKEYAN KANDASAMY                 1  0.557  0.087  doctor, hospital, pharmacy, me
+CAFE COFFEE HOUSE                                 1  0.618  0.079  restaurant, cafe, tea shop, fo
+Max Retail                                        1  0.637  0.078  clothing, electronics, shoppin
+MUGAVAI CAFE                                      2  0.571  0.069  restaurant, cafe, tea shop, fo
+CHAI WAALE                                        1  0.585  0.067  restaurant, cafe, tea shop, fo
+Jio Prepaid                                      24  0.567  0.063  mobile recharge, electricity b
+MANGOS CAFE                                       1  0.559  0.063  restaurant, cafe, tea shop, fo
+Alv Fuels                                         1  0.576  0.060  travel, taxi, metro, fuel, tra
+CMRL AIRPORT METRO TOM 11                         1  0.545  0.060  travel, taxi, metro, fuel, tra
+retailnaukri                                      1  0.610  0.059  clothing, electronics, shoppin
+Flipkart Payments                                 1  0.565  0.058  mobile recharge, electricity b
+ELLAGIRI CLINIC                                   1  0.547  0.055  doctor, hospital, pharmacy, me
+Kolkata Lassi House                               2  0.566  0.051  restaurant, cafe, tea shop, fo
+HAPPY CAFE                                        7  0.577  0.050  restaurant, cafe, tea shop, fo
+VROOTSCAFE                                        1  0.564  0.048  restaurant, cafe, tea shop, fo
+FALCONS TRANSPORT SERVICES                        1  0.546  0.046  travel, taxi, metro, fuel, tra
+ROPPEN TRANSPORTATION SERVICES PRIVATE LIMITED    1  0.534  0.045  travel, taxi, metro, fuel, tra
+KAFA CLOTHING INDIA PRIVATE LIMITED               1  0.550  0.045  clothing, electronics, shoppin
+SABURA READYMADE STORES                           1  0.615  0.043  clothing, electronics, shoppin
+GREEN BERRIES CAKE SHOP                           5  0.583  0.042  restaurant, cafe, tea shop, fo
+GRAND SQUARE MALL                                 1  0.590  0.042  clothing, electronics, shoppin
+AVENUE SUPERMARTS LTD                             1  0.595  0.039  groceries, supermarket, provis
+Blinkit                                           1  0.549  0.034  groceries, supermarket, provis
+ekart                                             2  0.561  0.033  clothing, electronics, shoppin
+SUPER MEDICALS                                    1  0.609  0.033  doctor, hospital, pharmacy, me
+M S JAI ANJANEYA TRADERS                          1  0.502  0.029  clothing, electronics, shoppin
+NAWAB HOSPITALITY AND CATERING SERVICES           1  0.522  0.027  restaurant, cafe, tea shop, fo
+EKART                                             1  0.552  0.027  clothing, electronics, shoppin
+SYED ABDUL RAHUMAN S                              1  0.520  0.026  mobile recharge, electricity b
+best fast food                                    1  0.552  0.025  restaurant, cafe, tea shop, fo
+NIRMALA DEVI H                                    1  0.515  0.024  doctor, hospital, pharmacy, me
+SARAVANAN B                                       1  0.515  0.024  clothing, electronics, shoppin
+GADDAM HARIBABU REDDY                             8  0.486  0.024  doctor, hospital, pharmacy, me
+USSN PRODUCTS                                     1  0.529  0.024  clothing, electronics, shoppin
+M S BRIYANI                                       3  0.520  0.023  restaurant, cafe, tea shop, fo
+Anubalaji store                                   1  0.550  0.023  clothing, electronics, shoppin
+Syed Fast food                                    1  0.554  0.023  restaurant, cafe, tea shop, fo
+Tagmango Private Limited                          1  0.511  0.022  mobile recharge, electricity b
+HOTEL BS BIRIYANI                                 1  0.516  0.022  restaurant, cafe, tea shop, fo
+Santhiya B                                        3  0.529  0.021  restaurant, cafe, tea shop, fo
+MATHEW GARMENTS- T NAGAR                          1  0.498  0.020  clothing, electronics, shoppin
+K GOMATHI                                         2  0.488  0.019  doctor, hospital, pharmacy, me
+MONISHA                                           2  0.517  0.019  clothing, electronics, shoppin
+Krishnaraj And Co                                 1  0.496  0.019  mobile recharge, electricity b
+T Nagar A J Services Station                      1  0.512  0.018  mobile recharge, electricity b
+Anitha Agencies                                   1  0.506  0.017  clothing, electronics, shoppin
+Surya Thavamani                                   1  0.494  0.016  travel, taxi, metro, fuel, tra
+AMUDHUNAVU                                        7  0.500  0.016  groceries, supermarket, provis
+Rajaram                                           2  0.479  0.016  mobile recharge, electricity b
+VELLORE LORRY OWNERS ASSOCIATN-U NEW ADHOC        1  0.488  0.016  mobile recharge, electricity b
+GRP SRI VNKATESA PERUMAL BAKERY                   1  0.532  0.016  restaurant, cafe, tea shop, fo
+SHOYAIB ALAM                                      1  0.503  0.015  restaurant, cafe, tea shop, fo
+MR K M SELVAM                                     1  0.487  0.015  clothing, electronics, shoppin
+THAMOTHIRAN                                       2  0.485  0.015  doctor, hospital, pharmacy, me
+ROGEN                                             1  0.524  0.015  doctor, hospital, pharmacy, me
+EKAYARS                                           1  0.515  0.015  clothing, electronics, shoppin
+VENU SIVA                                         1  0.486  0.014  clothing, electronics, shoppin
+R Sankar                                          1  0.509  0.014  clothing, electronics, shoppin
+Hari Trishan                                      1  0.508  0.014  doctor, hospital, pharmacy, me
+RAMACHANDRAN V                                   19  0.504  0.014  clothing, electronics, shoppin
+RAJESHA                                           1  0.520  0.014  mobile recharge, electricity b
+KRISHNAVENI THEATRE 1                             1  0.515  0.014  doctor, hospital, pharmacy, me
+SRI GOMATHI RAVI SWEETS                           1  0.499  0.014  restaurant, cafe, tea shop, fo
+Adhoc M L V Agency                                1  0.525  0.014  doctor, hospital, pharmacy, me
+Mala Anumuthu                                     1  0.500  0.013  doctor, hospital, pharmacy, me
+SYED ALIJAN S                                     1  0.512  0.013  mobile recharge, electricity b
+M SYED ABUTHAHIR                                  3  0.492  0.013  mobile recharge, electricity b
+Sakthivel                                         3  0.498  0.013  clothing, electronics, shoppin
+KALAIMANI S                                       1  0.506  0.013  clothing, electronics, shoppin
+MR MAHMOOD MUSTHAAQ N H                           8  0.502  0.013  mobile recharge, electricity b
+Kannabiran B                                      1  0.493  0.012  clothing, electronics, shoppin
+Amazon Pay on Delivery                            1  0.532  0.012  mobile recharge, electricity b
+Gayathri M                                        1  0.489  0.012  doctor, hospital, pharmacy, me
+MR ARUNKUMAR P                                    1  0.495  0.011  clothing, electronics, shoppin
+Neelaveni E                                       4  0.499  0.011  clothing, electronics, shoppin
+SENTHIL P                                         3  0.506  0.011  clothing, electronics, shoppin
+K RAGHU                                           1  0.507  0.011  doctor, hospital, pharmacy, me
+V VASANTHA RAJAN                                  1  0.503  0.011  mobile recharge, electricity b
+BENAZEER BEGUM                                   12  0.497  0.011  mobile recharge, electricity b
+Sami N                                            1  0.506  0.010  travel, taxi, metro, fuel, tra
+Mrs Usharani Devan                                1  0.484  0.010  clothing, electronics, shoppin
+MURUGESAN                                         3  0.522  0.010  clothing, electronics, shoppin
+Muthusamy A                                       1  0.492  0.010  clothing, electronics, shoppin
+Shobana                                           1  0.492  0.010  doctor, hospital, pharmacy, me
+Raghu PK                                          1  0.484  0.010  mobile recharge, electricity b
+IMDADULLAH MM                                     1  0.495  0.010  restaurant, cafe, tea shop, fo
+SYED APUTHAHIR                                    7  0.494  0.009  mobile recharge, electricity b
+Sri Brijwasi sweet                                1  0.498  0.009  restaurant, cafe, tea shop, fo
+Ms JAYAPRIYA                                      1  0.504  0.009  mobile recharge, electricity b
+Mahalaksmi A                                      1  0.508  0.009  clothing, electronics, shoppin
+KARTHI S                                          4  0.491  0.009  clothing, electronics, shoppin
+MR RAJKUMAR                                       5  0.508  0.009  mobile recharge, electricity b
+ABISHOLIN P S                                     1  0.501  0.009  clothing, electronics, shoppin
+SANTHI SERVICE STATION                            1  0.519  0.009  restaurant, cafe, tea shop, fo
+Sivakumar Petrol Bunk                             1  0.528  0.009  travel, taxi, metro, fuel, tra
+Keerthana Krishnamoorthi                          3  0.487  0.009  clothing, electronics, shoppin
+ABDULLAH JAMAL                                    3  0.510  0.008  doctor, hospital, pharmacy, me
+Singaravelan Subramani                            1  0.507  0.008  clothing, electronics, shoppin
+Mr G SANTHOSH                                     5  0.491  0.008  restaurant, cafe, tea shop, fo
+G Anbalagan                                       1  0.495  0.008  doctor, hospital, pharmacy, me
+Ashok Sharma                                      1  0.476  0.008  doctor, hospital, pharmacy, me
+Franklin Leo                                      2  0.502  0.007  doctor, hospital, pharmacy, me
+Antony Xavier                                     4  0.507  0.007  travel, taxi, metro, fuel, tra
+ABITHA BANU P                                     3  0.501  0.007  groceries, supermarket, provis
+RAMACHANDRAN                                      1  0.511  0.007  doctor, hospital, pharmacy, me
+MAHESH BABU                                       1  0.494  0.007  mobile recharge, electricity b
+MUTHU VIMALA M                                    1  0.490  0.007  clothing, electronics, shoppin
+ANSAR B                                           2  0.510  0.007  doctor, hospital, pharmacy, me
+Vimal Kumar                                       1  0.499  0.007  doctor, hospital, pharmacy, me
+MR MUSTAAQ RAHIM MAHDHOOM                         2  0.501  0.006  doctor, hospital, pharmacy, me
+Sakthi Prithika                                   1  0.487  0.006  mobile recharge, electricity b
+NGUNASEKARAN                                      1  0.517  0.006  clothing, electronics, shoppin
+M S BROTHERS                                      2  0.499  0.006  clothing, electronics, shoppin
+G LOGANATHAN                                      1  0.486  0.006  clothing, electronics, shoppin
+V K JUICE BOX                                     1  0.514  0.006  restaurant, cafe, tea shop, fo
+deepa mahendran                                   2  0.497  0.006  travel, taxi, metro, fuel, tra
+Kavilash                                          1  0.518  0.006  restaurant, cafe, tea shop, fo
+MR FAROOK BASHA D                                 1  0.479  0.006  doctor, hospital, pharmacy, me
+Umarani                                          10  0.513  0.006  clothing, electronics, shoppin
+AJITHA                                            1  0.505  0.005  clothing, electronics, shoppin
+K Babu                                            1  0.502  0.005  doctor, hospital, pharmacy, me
+KAVALRY TECHNOLOGIES                              1  0.507  0.005  clothing, electronics, shoppin
+AYYANRAJPANDY                                     4  0.506  0.005  mobile recharge, electricity b
+Mrs Nandhini A                                    1  0.475  0.005  mobile recharge, electricity b
+Sophiaj 0811                                      2  0.525  0.005  clothing, electronics, shoppin
+MUBARAK A K                                       4  0.510  0.005  clothing, electronics, shoppin
+Guna Sekar                                        1  0.493  0.005  doctor, hospital, pharmacy, me
+Jomy James                                        1  0.481  0.005  travel, taxi, metro, fuel, tra
+Ramachandran V                                    3  0.495  0.005  clothing, electronics, shoppin
+FRANKLIN                                          5  0.505  0.005  doctor, hospital, pharmacy, me
+VARSHA TIFFIN CENTER                              2  0.511  0.005  mobile recharge, electricity b
+JIO                                               3  0.514  0.004  clothing, electronics, shoppin
+M/S.DEVI MOTORS                                   1  0.513  0.004  travel, taxi, metro, fuel, tra
+Bablu bablu                                       1  0.525  0.004  doctor, hospital, pharmacy, me
+Vellaiammal store                                 4  0.546  0.004  clothing, electronics, shoppin
+Magesh Thirupathi                                 1  0.497  0.004  mobile recharge, electricity b
+VIJAYALAKSMI K                                    1  0.493  0.004  clothing, electronics, shoppin
+amala a                                           5  0.503  0.004  doctor, hospital, pharmacy, me
+THANIGAIVEL PRAVEEN SRIRAM                        1  0.486  0.003  groceries, supermarket, provis
+Mr V RAVI                                         1  0.509  0.003  doctor, hospital, pharmacy, me
+Saravana Selvarathin                              1  0.495  0.003  clothing, electronics, shoppin
+Ilangovan T                                       4  0.480  0.003  clothing, electronics, shoppin
+M S EKAYARS                                       5  0.501  0.003  doctor, hospital, pharmacy, me
+SATHAM MOHAMED                                    2  0.495  0.003  clothing, electronics, shoppin
+MOORTHY PERIYAKUZHANDAI                           1  0.474  0.003  mobile recharge, electricity b
+JAYAKUMAR R                                       1  0.489  0.003  groceries, supermarket, provis
+Venu Cool Bar                                     1  0.492  0.003  doctor, hospital, pharmacy, me
+GOVINTHARAJ RAJA                                  3  0.478  0.002  restaurant, cafe, tea shop, fo
+Babu M                                            1  0.507  0.002  doctor, hospital, pharmacy, me
+RAMESH KUMAR K                                    1  0.509  0.002  mobile recharge, electricity b
+ANANDA HOTEL                                      1  0.508  0.002  restaurant, cafe, tea shop, fo
+FATHIMA JINNA ABDUL VAHAB                         1  0.473  0.002  groceries, supermarket, provis
+RAJIVGANDHI                                       1  0.495  0.002  mobile recharge, electricity b
+Aswini automobiles                                1  0.501  0.002  doctor, hospital, pharmacy, me
+MAHALAKSHMI MESS                                  2  0.516  0.002  doctor, hospital, pharmacy, me
+MALATHY COOL BAR                                  2  0.513  0.001  restaurant, cafe, tea shop, fo
+NIJAM BASHA H                                     1  0.489  0.001  clothing, electronics, shoppin
+SK SARUK                                          1  0.502  0.001  clothing, electronics, shoppin
+SIVAKUMAR S                                       3  0.476  0.001  clothing, electronics, shoppin
+Perumal Krishnan                                  1  0.507  0.001  clothing, electronics, shoppin
+ANANDHA VILAS POS 4                               3  0.510  0.001  restaurant, cafe, tea shop, fo
+ABDULLAH TIFFEN CENTER                            3  0.522  0.001  restaurant, cafe, tea shop, fo
+JAISHNAVI ENTERPRISES                             1  0.491  0.000  doctor, hospital, pharmacy, me
+SK YAKUB                                          1  0.497  0.000  travel, taxi, metro, fuel, tra
+
+gap percentiles
+  p25: 0.005
+  p50: 0.010
+  p75: 0.020
+  p90: 0.045
+  p95: 0.060
+
+how many clear the bar
+  gap >= 0.02:  41 payees (  25%)  covering  88 payments (  25%)
+  gap >= 0.03:  25 payees (  15%)  covering  61 payments (  17%)
+  gap >= 0.04:  21 payees (  13%)  covering  56 payments (  16%)
+  gap >= 0.05:  13 payees (   8%)  covering  38 payments (  11%)
+  gap >= 0.06:   7 payees (   4%)  covering  31 payments (   9%)

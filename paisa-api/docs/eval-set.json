@@ -1,0 +1,246 @@
+{
+  "_note": "Labels marked confidence 'name' come from the payee name itself. Labels marked 'guess' were inferred from frequency, amount and time of day — verify every one of those from memory before trusting this file. Delete any row you cannot place.",
+  "categories": [
+    "food",
+    "groceries",
+    "travel",
+    "mobile",
+    "health",
+    "shopping",
+    "transfer",
+    "other"
+  ],
+  "payees": [
+    {
+      "payee": "Jio Prepaid",
+      "category": "mobile",
+      "confidence": "name"
+    },
+    {
+      "payee": "JIO",
+      "category": "mobile",
+      "confidence": "name"
+    },
+    {
+      "payee": "HAPPY CAFE",
+      "category": "food",
+      "confidence": "name"
+    },
+    {
+      "payee": "GREEN BERRIES CAKE SHOP",
+      "category": "food",
+      "confidence": "name"
+    },
+    {
+      "payee": "M S BRIYANI",
+      "category": "food",
+      "confidence": "name"
+    },
+    {
+      "payee": "VARSHA TIFFIN CENTER",
+      "category": "food",
+      "confidence": "name"
+    },
+    {
+      "payee": "ABDULLAH TIFFEN CENTER",
+      "category": "food",
+      "confidence": "name"
+    },
+    {
+      "payee": "ANANDHA VILAS POS 4",
+      "category": "food",
+      "confidence": "name"
+    },
+    {
+      "payee": "Vellaiammal store",
+      "category": "groceries",
+      "confidence": "name"
+    },
+    {
+      "payee": "Santhiya B",
+      "category": "transfer",
+      "confidence": "amount",
+      "why": "3 payments averaging 35,000"
+    },
+    {
+      "payee": "GOVINTHARAJ RAJA",
+      "category": "transfer",
+      "confidence": "amount",
+      "why": "3 payments averaging 30,000"
+    },
+    {
+      "payee": "Antony Xavier",
+      "category": "transfer",
+      "confidence": "amount",
+      "why": "4 payments averaging 2,107"
+    },
+    {
+      "payee": "FRANKLIN",
+      "category": "transfer",
+      "confidence": "amount",
+      "why": "1,954 average, and money comes back from the same name"
+    },
+    {
+      "payee": "Mr G SANTHOSH",
+      "category": "transfer",
+      "confidence": "amount",
+      "why": "1,070 average, and money comes back"
+    },
+    {
+      "payee": "deepa mahendran",
+      "category": "transfer",
+      "confidence": "amount",
+      "why": "paid 401, received 410 — settling, not buying"
+    },
+    {
+      "payee": "RAMACHANDRAN V",
+      "category": "food",
+      "confidence": "guess",
+      "why": "19 payments, 51 average, 58% morning"
+    },
+    {
+      "payee": "Ramachandran V",
+      "category": "food",
+      "confidence": "guess",
+      "why": "same payee as above, different spelling"
+    },
+    {
+      "payee": "BENAZEER BEGUM",
+      "category": "food",
+      "confidence": "guess",
+      "why": "12 payments, 40 average, every one in the evening"
+    },
+    {
+      "payee": "Umarani",
+      "category": "food",
+      "confidence": "guess",
+      "why": "10 payments, 47 average, mostly morning"
+    },
+    {
+      "payee": "GADDAM HARIBABU REDDY",
+      "category": "food",
+      "confidence": "guess",
+      "why": "8 payments, 54 average"
+    },
+    {
+      "payee": "MR MAHMOOD MUSTHAAQ N H",
+      "category": "food",
+      "confidence": "guess",
+      "why": "8 payments, 40 average, every one in the evening"
+    },
+    {
+      "payee": "MR MUSTAAQ RAHIM MAHDHOOM",
+      "category": "food",
+      "confidence": "guess",
+      "why": "may be the same person as above"
+    },
+    {
+      "payee": "SYED APUTHAHIR",
+      "category": "food",
+      "confidence": "guess",
+      "why": "7 payments, 95 average, evenings"
+    },
+    {
+      "payee": "M SYED ABUTHAHIR",
+      "category": "food",
+      "confidence": "guess",
+      "why": "may be the same person as above"
+    },
+    {
+      "payee": "AMUDHUNAVU",
+      "category": "food",
+      "confidence": "guess",
+      "why": "7 payments, 38 average"
+    },
+    {
+      "payee": "amala a",
+      "category": "food",
+      "confidence": "guess",
+      "why": "5 payments, 55 average, 80% morning"
+    },
+    {
+      "payee": "MR RAJKUMAR",
+      "category": "food",
+      "confidence": "guess",
+      "why": "5 payments, 46 average"
+    },
+    {
+      "payee": "AYYANRAJPANDY",
+      "category": "food",
+      "confidence": "guess",
+      "why": "4 payments, 62 average, every one in the morning"
+    },
+    {
+      "payee": "MUBARAK A K",
+      "category": "food",
+      "confidence": "guess",
+      "why": "4 payments, 34 average"
+    },
+    {
+      "payee": "KARTHI S",
+      "category": "food",
+      "confidence": "guess",
+      "why": "4 payments, 62 average"
+    },
+    {
+      "payee": "Neelaveni E",
+      "category": "food",
+      "confidence": "guess",
+      "why": "4 payments, 36 average, every one in the morning"
+    },
+    {
+      "payee": "Ilangovan T",
+      "category": "food",
+      "confidence": "guess",
+      "why": "4 payments, 39 average, every one in the morning"
+    },
+    {
+      "payee": "Sakthivel",
+      "category": "food",
+      "confidence": "guess",
+      "why": "3 payments, 57 average, evenings"
+    },
+    {
+      "payee": "ABDULLAH JAMAL",
+      "category": "food",
+      "confidence": "guess",
+      "why": "3 payments, 40 average, late night"
+    },
+    {
+      "payee": "SENTHIL P",
+      "category": "food",
+      "confidence": "guess",
+      "why": "3 payments, 33 average"
+    },
+    {
+      "payee": "ABITHA BANU P",
+      "category": "food",
+      "confidence": "guess",
+      "why": "3 payments, 33 average, evenings"
+    },
+    {
+      "payee": "Keerthana Krishnamoorthi",
+      "category": "food",
+      "confidence": "guess",
+      "why": "3 payments, 19 average, mornings"
+    },
+    {
+      "payee": "MURUGESAN",
+      "category": "food",
+      "confidence": "guess",
+      "why": "3 payments, 42 average, evenings"
+    },
+    {
+      "payee": "M S EKAYARS",
+      "category": "",
+      "confidence": "unknown",
+      "why": "276 average is too high for tea, too low to be a transfer — you need to say"
+    },
+    {
+      "payee": "SIVAKUMAR S",
+      "category": "",
+      "confidence": "unknown",
+      "why": "227 average; there is also a Sivakumar Petrol Bunk in your data — same person?"
+    }
+  ]
+}

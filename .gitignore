@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+# python
+paisa-api/.venv/
+__pycache__/
+*.pyc
+paisa-api/.env
+paisa-api/logs/
+paisa-api/storage/
+paisa-api/docs/embedding-cache.json
+
+# node
+paisa-web/node_modules/
+paisa-web/dist/
+paisa-web/.env.local
+
+.DS_Store
