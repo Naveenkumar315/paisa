@@ -38,3 +38,15 @@ async def complete_json(prompt: str) -> dict:
     )
 
     return json.loads(response.choices[0].message.content)
+
+
+async def chat_with_tools(messages: list[dict], tools: list[dict]):
+    """One turn with tools attached. Returns the message and token count."""
+    response = await _client.chat.completions.create(
+        model=settings.azure_openai_deployment,
+        messages=messages,
+        tools=tools,
+        temperature=0,
+    )
+    usage = response.usage.total_tokens if response.usage else 0
+    return response.choices[0].message, usage

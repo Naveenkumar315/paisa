@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import pymongo
 from beanie import Document, PydanticObjectId
 from pydantic import Field
+from typing import Any
 
 
 def utcnow() -> datetime:
@@ -97,4 +98,43 @@ class Payee(Document):
         ]
 
 
-DOCUMENT_MODELS = [User, Statement, Transaction, Payee]
+class AgentRun(Document):
+    user_id: PydanticObjectId
+    question: str
+    answer: str | None = None
+    steps: int = 0
+    tokens: int = 0
+    duration_ms: int = 0
+    created_at: datetime = Field(default_factory=utcnow)
+
+    class Settings:
+        name = "agent_runs"
+        indexes = [
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING),
+                 ("created_at", pymongo.DESCENDING)]
+            ),
+        ]
+
+
+class AgentStep(Document):
+    """One think, tool call or answer. The trace screen is a query here."""
+
+    run_id: PydanticObjectId
+    step_no: int
+    kind: str                       # "tool" | "retry" | "answer"
+    tool_name: str | None = None
+    arguments: dict[str, Any] | None = None
+    result: dict[str, Any] | None = None
+    duration_ms: int = 0
+    created_at: datetime = Field(default_factory=utcnow)
+
+    class Settings:
+        name = "agent_steps"
+        indexes = [
+            pymongo.IndexModel(
+                [("run_id", pymongo.ASCENDING), ("step_no", pymongo.ASCENDING)]),
+        ]
+
+
+DOCUMENT_MODELS = [User, Statement, Transaction, Payee, AgentRun, AgentStep]
