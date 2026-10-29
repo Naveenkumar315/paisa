@@ -196,6 +196,30 @@ async def category_trend(user_id: PydanticObjectId) -> list[dict]:
     return list(out.values())
 
 
+async def daily_series(user_id: PydanticObjectId) -> list[dict]:
+    """Everyday spending per calendar day, oldest first. Days with no
+    spending are left out; the heatmap fills them in as empty cells."""
+    pipeline = [
+        {"$match": {"user_id": user_id}},
+        *_with_category(),
+        {"$match": {"bucket": "spending"}},
+        {
+            "$group": {
+                "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$occurred_at"}},
+                "total": {"$sum": "$amount_paise"},
+                "count": {"$sum": 1},
+            }
+        },
+        {"$sort": {"_id": 1}},
+    ]
+
+    rows = await Transaction.aggregate(pipeline).to_list()
+    return [
+        {"date": r["_id"], "amount_paise": r["total"], "count": r["count"]}
+        for r in rows
+    ]
+
+
 async def mobile_recharges(user_id: PydanticObjectId) -> list[dict]:
     """How many times each recharge amount was paid, per operator and month.
     Grouped on the exact amount paid, so a plan whose price changed shows
