@@ -26,7 +26,7 @@ export default function CategoryBreakdown({
 }) {
   return (
     <Card className="min-w-0 flex-[999_1_400px]">
-      <h2 className="mb-4 text-[15px] font-semibold">
+      <h2 className="mb-4 text-base font-semibold tracking-[-0.015em]">
         Where the {money(total)} went
       </h2>
 

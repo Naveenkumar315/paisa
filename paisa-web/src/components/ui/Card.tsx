@@ -13,7 +13,7 @@ export default function Card({
     return (
         <section
             className={cn(
-                "rounded-2xl border bg-surface px-6 py-5",
+                "rounded-2xl border bg-surface px-6 py-5 shadow-card",
                 tone === "warn" ? "border-warn-line" : "border-line",
                 className
             )}

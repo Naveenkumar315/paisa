@@ -1,6 +1,6 @@
 import logging
-import uuid
-from pathlib import Path
+import os
+import tempfile
 
 from beanie import PydanticObjectId
 from pymongo.errors import BulkWriteError
@@ -8,36 +8,41 @@ from pymongo.errors import BulkWriteError
 from app.core.config import settings
 from app.core.errors import AppError
 from app.db.models import Statement, Transaction
-from app.services.gpay_parser import parse_statement
+from app.services.gpay_parser import ParsedTxn, parse_statement
 
 logger = logging.getLogger("paisa")
 
 DUPLICATE_KEY = 11000
 
 
-def save_upload(user_id: PydanticObjectId, filename: str, data: bytes) -> Path:
+def _parse_upload(filename: str, data: bytes) -> list[ParsedTxn]:
+    """Parse the PDF from a temp file, then delete it.
+
+    The statement carries an email, a phone number and every UPI
+    reference, and nothing reads it after parsing. The parser needs a
+    real path, so it lives on disk only for the length of this call.
+    """
     if not filename.lower().endswith(".pdf"):
         raise AppError("Only PDF statements are supported", status_code=415)
     if len(data) > settings.max_upload_mb * 1024 * 1024:
         raise AppError(
             f"File is over {settings.max_upload_mb}MB", status_code=413)
 
-    folder = settings.upload_dir / str(user_id)
-    folder.mkdir(parents=True, exist_ok=True)
-    # Never trust the uploaded name on disk — it can contain ../ or a
-    # Windows reserved name. Store under a generated key, keep the
-    # original name as a label in the Statement document.
-    path = folder / f"{uuid.uuid4().hex}.pdf"
-    path.write_bytes(data)
-    return path
+    # delete=False and close before parsing: Windows will not let the
+    # parser open a file that is still held open for writing.
+    tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    try:
+        with tmp:
+            tmp.write(data)
+        return parse_statement(tmp.name)
+    finally:
+        os.unlink(tmp.name)
 
 
 async def import_statement(
     user_id: PydanticObjectId, filename: str, data: bytes
 ) -> Statement:
-    path = save_upload(user_id, filename, data)
-
-    parsed = parse_statement(str(path))
+    parsed = _parse_upload(filename, data)
     if not parsed:
         raise AppError(
             "No transactions found. Is this a Google Pay statement?", status_code=422
@@ -46,7 +51,6 @@ async def import_statement(
     statement = Statement(
         user_id=user_id,
         original_filename=filename,
-        file_key=str(path),
         period_start=min(p.occurred_at for p in parsed),
         period_end=max(p.occurred_at for p in parsed),
         rows_parsed=len(parsed),

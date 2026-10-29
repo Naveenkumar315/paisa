@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pathlib import Path
 
 
 class Settings(BaseSettings):
@@ -15,7 +14,6 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 60 * 24
 
     cors_origins: list[str] = ["http://localhost:5173"]
-    upload_dir: Path = Path("storage/uploads")
     max_upload_mb: int = 20
     gemini_api_key: str = ""
     embedding_model: str = "gemini-embedding-001"

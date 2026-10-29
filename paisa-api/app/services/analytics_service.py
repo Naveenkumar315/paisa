@@ -164,8 +164,69 @@ async def category_slices(user_id: PydanticObjectId, month: str) -> list[dict]:
     ]
 
 
-async def payee_summaries(user_id: PydanticObjectId, limit: int = 12) -> list[dict]:
+async def category_trend(user_id: PydanticObjectId) -> list[dict]:
+    """Spending per category per month, one row per month:
+    {"month": "2026-09", "food": 123400, "mobile": 29900, ...}."""
     pipeline = [
+        {"$match": {"user_id": user_id}},
+        *_with_category(),
+        {"$match": {"bucket": "spending"}},
+        {
+            "$group": {
+                "_id": {
+                    "month": {
+                        "$dateToString": {"format": "%Y-%m", "date": "$occurred_at"}
+                    },
+                    "category": {"$ifNull": ["$category", "uncategorised"]},
+                },
+                "total": {"$sum": "$amount_paise"},
+            }
+        },
+    ]
+
+    rows = await Transaction.aggregate(pipeline).to_list()
+
+    # Every category on every month, zero where nothing was spent — a
+    # missing key draws as a gap in the stack, not as zero.
+    months = sorted({r["_id"]["month"] for r in rows})
+    categories = sorted({r["_id"]["category"] for r in rows})
+    out = {m: {"month": m, **{c: 0 for c in categories}} for m in months}
+    for r in rows:
+        out[r["_id"]["month"]][r["_id"]["category"]] = r["total"]
+    return list(out.values())
+
+
+async def mobile_recharges(user_id: PydanticObjectId) -> list[dict]:
+    """How many times each recharge amount was paid, per operator and month.
+    Grouped on the exact amount paid, so a plan whose price changed shows
+    up as two rows rather than being merged into one."""
+    pipeline = [
+        {"$match": {"user_id": user_id}},
+        *_with_category(),
+        {"$match": {"bucket": "spending", "category": "mobile"}},
+        {
+            "$group": {
+                "_id": {
+                    "month": {
+                        "$dateToString": {"format": "%Y-%m", "date": "$occurred_at"}
+                    },
+                    "payee": "$counterparty_raw",
+                    "amount_paise": "$amount_paise",
+                },
+                "count": {"$sum": 1},
+            }
+        },
+        {"$sort": {"_id.month": 1, "_id.payee": 1, "_id.amount_paise": 1}},
+    ]
+
+    rows = await Transaction.aggregate(pipeline).to_list()
+    return [{**r["_id"], "count": r["count"]} for r in rows]
+
+
+async def payee_summaries(
+    user_id: PydanticObjectId, limit: int = 12, month: str | None = None
+) -> list[dict]:
+    pipeline: list[dict] = [
         {
             "$match": {
                 "user_id": user_id,
@@ -173,6 +234,18 @@ async def payee_summaries(user_id: PydanticObjectId, limit: int = 12) -> list[di
                 "is_self_transfer": False,
             }
         },
+    ]
+    if month:
+        # Filter before the payee lookup so the join only runs over one month.
+        pipeline += [
+            {
+                "$addFields": {
+                    "month": {"$dateToString": {"format": "%Y-%m", "date": "$occurred_at"}}
+                }
+            },
+            {"$match": {"month": month}},
+        ]
+    pipeline += [
         *_with_category(),
         {
             "$group": {
@@ -232,3 +305,82 @@ async def clock_buckets(user_id: PydanticObjectId) -> list[dict]:
         }
         for label, hours in labels
     ]
+
+
+async def people_balances(user_id: PydanticObjectId) -> list[dict]:
+    """Net position with each counterparty money moves both ways with.
+
+    A loan that came back is not spending. Without netting, lending
+    50,000 and getting it back reads as a 50,000 month.
+    """
+    pipeline = [
+        {"$match": {"user_id": user_id, "is_self_transfer": False}},
+        {
+            "$group": {
+                "_id": "$counterparty_raw",
+                "paid": {
+                    "$sum": {
+                        "$cond": [{"$eq": ["$direction", "debit"]}, "$amount_paise", 0]
+                    }
+                },
+                "paid_count": {
+                    "$sum": {"$cond": [{"$eq": ["$direction", "debit"]}, 1, 0]}
+                },
+                "received": {
+                    "$sum": {
+                        "$cond": [{"$eq": ["$direction", "credit"]}, "$amount_paise", 0]
+                    }
+                },
+                "received_count": {
+                    "$sum": {"$cond": [{"$eq": ["$direction", "credit"]}, 1, 0]}
+                },
+            }
+        },
+        # Only people money has moved both ways with. A shop you only
+        # pay is not a balance, it is spending.
+        {"$match": {"paid_count": {"$gt": 0}, "received_count": {"$gt": 0}}},
+        {"$addFields": {"net": {"$subtract": ["$received", "$paid"]}}},
+        {"$sort": {"paid": -1}},
+    ]
+
+    rows = await Transaction.aggregate(pipeline).to_list()
+    return [
+        {
+            "name": r["_id"],
+            "paid_paise": r["paid"],
+            "paid_count": r["paid_count"],
+            "received_paise": r["received"],
+            "received_count": r["received_count"],
+            "net_paise": r["net"],
+            # Under 500 rupees either way is noise, not a debt.
+            "settled": abs(r["net"]) < 50_000,
+        }
+        for r in rows
+    ]
+
+
+async def person_ledger(user_id: PydanticObjectId, name: str) -> list[dict]:
+    """Every payment with one person, oldest first, with a running balance."""
+    rows = (
+        await Transaction.find(
+            Transaction.user_id == user_id,
+            Transaction.counterparty_raw == name,
+            Transaction.is_self_transfer == False,  # noqa: E712
+        )
+        .sort(Transaction.occurred_at)
+        .to_list()
+    )
+
+    out = []
+    running = 0
+    for t in rows:
+        running += t.amount_paise if t.direction == "credit" else -t.amount_paise
+        out.append(
+            {
+                "occurred_at": t.occurred_at,
+                "direction": t.direction,
+                "amount_paise": t.amount_paise,
+                "running_paise": running,
+            }
+        )
+    return out

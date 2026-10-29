@@ -59,11 +59,10 @@ class Transaction(Document):
 
 
 class Statement(Document):
-    """One uploaded PDF. Kept so an import can be traced."""
+    """One import of an uploaded PDF, kept so it can be traced. The PDF itself is not."""
 
     user_id: PydanticObjectId
     original_filename: str
-    file_key: str
     period_start: datetime | None = None
     period_end: datetime | None = None
     rows_parsed: int = 0

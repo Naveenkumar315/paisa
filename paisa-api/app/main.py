@@ -13,6 +13,7 @@ from app.api.statements import router as statements_router
 from app.api.auth import router as auth_router
 from app.api.analytics import router as analytics_router
 from app.api.payees import router as payees_router
+from app.api.ask import router as ask_router
 
 
 @asynccontextmanager
@@ -41,6 +42,7 @@ app.include_router(auth_router)
 app.include_router(statements_router)
 app.include_router(analytics_router)
 app.include_router(payees_router)
+app.include_router(ask_router)
 
 
 register_middleware(app)

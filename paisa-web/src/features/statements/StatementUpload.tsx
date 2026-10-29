@@ -80,7 +80,7 @@ export default function StatementUpload({
         >
             {input}
 
-            <h2 className="mb-2 text-lg font-bold tracking-tight">
+            <h2 className="mb-2 text-xl font-semibold tracking-[-0.02em]">
                 Import your Google Pay statement
             </h2>
             <p className="mx-auto mb-6 max-w-md text-sm leading-relaxed text-ink-2">

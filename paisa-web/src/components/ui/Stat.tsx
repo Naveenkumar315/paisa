@@ -21,7 +21,7 @@ export default function Stat({
                 {icon}
                 <p className="text-[13px] font-medium text-ink-3">{label}</p>
             </div>
-            <p className={cn("mb-1.5 font-mono text-[26px] tracking-tight", valueClass)}>
+            <p className={cn("mb-1.5 text-[28px] leading-tight font-medium tracking-[-0.03em]", valueClass)}>
                 {value}
             </p>
             {hint && <p className="text-[13px] text-ink-3">{hint}</p>}

@@ -129,6 +129,36 @@ TOOL_SCHEMAS: list[dict] = [
     {
         "type": "function",
         "function": {
+            "name": "find_payments",
+            "description": (
+                "Payments whose amount falls in a rupee range, counted per "
+                "month, payee and exact amount. Use it whenever the question "
+                "names an amount or a plan price. When the user is unsure of "
+                "the exact figure ('49 or 50', 'around 300'), search a small "
+                "range around it rather than one value."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "min_rupees": {"type": "number", "minimum": 0},
+                    "max_rupees": {"type": "number", "minimum": 0},
+                    "name": {
+                        "type": "string",
+                        "description": "Part of the payee name. Omit for every payee",
+                    },
+                    "month": {
+                        "type": "string",
+                        "pattern": MONTH_PATTERN,
+                        "description": "Omit for all months",
+                    },
+                },
+                "required": ["min_rupees", "max_rupees"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "list_months",
             "description": (
                 "Which months the statement covers, with each month's total. "
@@ -313,6 +343,86 @@ async def top_payees(
     }
 
 
+# A wide range over six months can match hundreds of groups. The model
+# only needs the shape of the answer, and the totals cover everything.
+FIND_PAYMENTS_MAX_ROWS = 40
+
+
+async def find_payments(
+    user_id: PydanticObjectId,
+    min_rupees: float,
+    max_rupees: float,
+    name: str | None = None,
+    month: str | None = None,
+) -> dict:
+    if month:
+        _check_month(month)
+    if min_rupees > max_rupees:
+        raise ValueError("min_rupees must not be greater than max_rupees")
+
+    match: dict = {
+        "user_id": user_id,
+        "direction": "debit",
+        "is_self_transfer": False,
+        "amount_paise": {
+            "$gte": round(min_rupees * 100),
+            "$lte": round(max_rupees * 100),
+        },
+    }
+    if name:
+        match["counterparty_raw"] = {"$regex": re.escape(name), "$options": "i"}
+
+    pipeline: list[dict] = [{"$match": match}, _month_field()]
+    if month:
+        pipeline.append({"$match": {"month": month}})
+    pipeline += [
+        {
+            "$group": {
+                "_id": {
+                    "month": "$month",
+                    "payee": "$counterparty_raw",
+                    "amount": "$amount_paise",
+                },
+                "count": {"$sum": 1},
+            }
+        },
+        {"$sort": {"_id.month": 1, "_id.payee": 1, "_id.amount": 1}},
+    ]
+
+    rows = await Transaction.aggregate(pipeline).to_list()
+    if not rows:
+        return {
+            "range_rupees": [min_rupees, max_rupees],
+            "payments": 0,
+            "note": "No payment in that range",
+        }
+
+    total_count = sum(r["count"] for r in rows)
+    total_paise = sum(r["_id"]["amount"] * r["count"] for r in rows)
+    by_payee: dict[str, int] = {}
+    for r in rows:
+        by_payee[r["_id"]["payee"]] = by_payee.get(r["_id"]["payee"], 0) + r["count"]
+
+    return {
+        "range_rupees": [min_rupees, max_rupees],
+        "payee_filter": name,
+        "month": month or "all months",
+        "payments": total_count,
+        "total_rupees": _rupees(total_paise),
+        "payments_by_payee": by_payee,
+        "groups": [
+            {
+                "month": r["_id"]["month"],
+                "payee": r["_id"]["payee"],
+                "amount_rupees": _rupees(r["_id"]["amount"]),
+                "times": r["count"],
+            }
+            for r in rows[:FIND_PAYMENTS_MAX_ROWS]
+        ],
+        "groups_truncated": len(rows) > FIND_PAYMENTS_MAX_ROWS,
+    }
+
+
 async def list_months(user_id: PydanticObjectId) -> dict:
     pipeline = [
         {"$match": {"user_id": user_id}},
@@ -337,6 +447,7 @@ HANDLERS: dict[str, Callable[..., Awaitable[dict]]] = {
     "get_payee_total": get_payee_total,
     "compare_months": compare_months,
     "top_payees": top_payees,
+    "find_payments": find_payments,
     "list_months": list_months,
 }
 

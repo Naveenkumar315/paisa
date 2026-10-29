@@ -41,11 +41,11 @@ export default function RegisterPage() {
                     <span className="inline-flex size-8 items-center justify-center rounded-[9px] bg-accent text-base font-bold text-white">
                         P
                     </span>
-                    <span className="text-lg font-bold tracking-tight">Paisa</span>
+                    <span className="text-xl font-semibold tracking-[-0.03em]">Paisa</span>
                 </div>
 
                 <div className="rounded-2xl border border-line bg-surface p-7">
-                    <h1 className="mb-1 text-xl font-bold tracking-tight">Create an account</h1>
+                    <h1 className="mb-1.5 text-2xl font-semibold tracking-[-0.025em]">Create an account</h1>
                     <p className="mb-6 text-sm text-ink-3">
                         Upload a statement and see where the money went.
                     </p>

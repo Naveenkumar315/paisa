@@ -12,9 +12,9 @@ export default function ClockPanel({ buckets }: { buckets: ClockBucket[] }) {
 
   return (
     <Card className="min-w-0 flex-[1_1_280px]">
-      <h2 className="mb-1 text-[15px] font-semibold">When you spend</h2>
+      <h2 className="mb-1 text-base font-semibold tracking-[-0.015em]">When you spend</h2>
       <p className="mb-4.5 text-[13px] text-ink-3">
-        {total} everyday payments, all six months
+        {total} everyday payments, all months combined
       </p>
 
       <div className="flex flex-col gap-3.5">

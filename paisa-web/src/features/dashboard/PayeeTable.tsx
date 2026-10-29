@@ -4,6 +4,7 @@ import Avatar from "../../components/ui/Avatar";
 import Badge from "../../components/ui/Badge";
 import Card from "../../components/ui/Card";
 import DataTable, { type Column } from "../../components/ui/DataTable";
+import { cn } from "../../lib/cn";
 import { money } from "../../lib/format";
 import type { PayeeSummary } from "../../types/api";
 
@@ -51,11 +52,44 @@ const columns: Column<PayeeSummary>[] = [
   },
 ];
 
-export default function PayeeTable({ payees }: { payees: PayeeSummary[] }) {
+export type PayeeScope = "month" | "all";
+
+const SCOPES: { value: PayeeScope; label: string }[] = [
+  { value: "month", label: "This month" },
+  { value: "all", label: "All months" },
+];
+
+export default function PayeeTable({
+  payees,
+  scope,
+  onScopeChange,
+}: {
+  payees: PayeeSummary[];
+  scope: PayeeScope;
+  onScopeChange: (scope: PayeeScope) => void;
+}) {
   return (
     <Card>
-      <div className="mb-1 flex flex-wrap items-baseline gap-3">
-        <h2 className="grow text-[15px] font-semibold">Most frequent payees</h2>
+      <div className="mb-1 flex flex-wrap items-center gap-3">
+        <h2 className="text-base font-semibold tracking-[-0.015em]">Most frequent payees</h2>
+        <div className="flex grow gap-1.5" role="group" aria-label="Payee period">
+          {SCOPES.map((s) => (
+            <button
+              key={s.value}
+              type="button"
+              aria-pressed={scope === s.value}
+              onClick={() => onScopeChange(s.value)}
+              className={cn(
+                "cursor-pointer rounded-md border px-2.5 py-1 text-[12.5px]",
+                scope === s.value
+                  ? "border-accent bg-accent-bg font-semibold text-accent-ink"
+                  : "border-line bg-surface font-medium text-ink-3"
+              )}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
         <Link to="/payees" className="text-[13.5px] font-semibold text-accent">
           All payees
         </Link>
@@ -64,7 +98,11 @@ export default function PayeeTable({ payees }: { payees: PayeeSummary[] }) {
         columns={columns}
         rows={payees}
         rowKey={(p) => p.name}
-        empty="Upload a statement to see your payees"
+        empty={
+          scope === "month"
+            ? "No payments to payees this month"
+            : "Upload a statement to see your payees"
+        }
       />
     </Card>
   );

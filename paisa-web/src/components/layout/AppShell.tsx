@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
+
 import { cn } from "../../lib/cn";
 import { useAuthStore } from "../../stores/auth";
 
@@ -15,12 +16,15 @@ export default function AppShell() {
 
     return (
         <div className="flex min-h-screen flex-wrap items-stretch bg-ground">
-            <aside className="flex min-w-0 flex-[0_1_232px] flex-col gap-7 border-r border-line bg-surface px-4 py-6">
+            {/* sticky, not fixed: it still takes part in the flex row, so the
+          main column is not left sitting underneath it. h-screen caps it
+          at the viewport so it never grows with the page. */}
+            <aside className="sticky top-0 flex h-screen min-w-0 flex-[0_0_232px] flex-col gap-7 overflow-y-auto border-r border-line bg-surface px-4 py-6">
                 <div className="flex items-center gap-2.5 px-2">
                     <span className="inline-flex size-[30px] items-center justify-center rounded-[9px] bg-accent text-[15px] font-bold text-white">
                         P
                     </span>
-                    <span className="font-bold tracking-tight">Paisa</span>
+                    <span className="text-[17px] font-semibold tracking-[-0.03em]">Paisa</span>
                 </div>
 
                 <nav className="flex flex-col gap-0.5">
@@ -42,6 +46,7 @@ export default function AppShell() {
                     ))}
                 </nav>
 
+                {/* mt-auto only reaches the bottom because the aside is h-screen */}
                 <div className="mt-auto border-t border-line-soft px-3 pt-5">
                     <p className="mb-2 truncate text-[13px] text-ink-2">{user?.email}</p>
                     <button

@@ -12,7 +12,7 @@ export const keys = {
     months: ["months"] as const,
     month: (m: string) => ["month", m] as const,
     categories: (m: string) => ["categories", m] as const,
-    payees: (limit: number) => ["payees", limit] as const,
+    payees: (limit: number, month?: string) => ["payees", limit, month ?? "all"] as const,
     clock: ["clock"] as const,
     statements: ["statements"] as const,
     transactions: (limit: number, offset: number) =>
@@ -28,6 +28,9 @@ export function useMonth(month: string) {
         queryKey: keys.month(month),
         queryFn: () => analytics.getMonth(month),
         enabled: Boolean(month),
+        // Keep the last month on screen while a new one loads, otherwise the
+        // dashboard flashes back to "Loading…" on every first click.
+        placeholderData: (previous) => previous,
     });
 }
 
@@ -36,13 +39,15 @@ export function useCategories(month: string) {
         queryKey: keys.categories(month),
         queryFn: () => analytics.getCategories(month),
         enabled: Boolean(month),
+        placeholderData: (previous) => previous,
     });
 }
 
-export function usePayees(limit = 12) {
+export function usePayees(limit = 12, month?: string) {
     return useQuery({
-        queryKey: keys.payees(limit),
-        queryFn: () => analytics.getPayees(limit),
+        queryKey: keys.payees(limit, month),
+        queryFn: () => analytics.getPayees(limit, month),
+        placeholderData: (previous) => previous,
     });
 }
 

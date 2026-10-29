@@ -96,6 +96,12 @@ async def _payee_stats(user_id: PydanticObjectId) -> dict[str, dict]:
 
 
 def _describe(name: str, s: dict) -> str:
+    """One prompt line per payee: the name and aggregate figures only.
+
+    UPI references, transaction ids and account numbers stay in Mongo.
+    The model has no use for them, and they are the parts of a statement
+    that identify the person.
+    """
     if s["count"] == 0:
         return f"- {name} | nothing paid out | they sent you Rs {s['received'] // 100}"
 

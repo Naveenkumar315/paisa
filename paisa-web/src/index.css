@@ -16,11 +16,26 @@
     --color-warn-line: #F0CF9B;
     --color-good-ink: #0D5240;
     --color-good-bg: #E7F2EE;
-    --font-sans: Inter, system-ui, sans-serif;
-    --font-mono: "IBM Plex Mono", monospace;
+    --font-sans: Geist, "Inter", system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, monospace;
+
+    /* Built from the ink colour so cards lift off the ground without
+       introducing a new grey. */
+    --shadow-card: 0 1px 2px rgb(21 23 28 / 0.04), 0 8px 24px -12px rgb(21 23 28 / 0.10);
 }
 
 body {
     margin: 0;
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Recharts makes the chart surface focusable, so a mouse click on a month
+   draws the browser's focus box around the whole chart. */
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus {
+    outline: none;
 }

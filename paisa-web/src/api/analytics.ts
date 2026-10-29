@@ -31,13 +31,13 @@ export async function getMonth(month: string): Promise<MonthSummary> {
     return data;
 }
 
-export async function getPayees(limit = 12): Promise<PayeeSummary[]> {
+export async function getPayees(limit = 12, month?: string): Promise<PayeeSummary[]> {
     if (USE_MOCKS) {
         await delay();
         return mockPayees.slice(0, limit);
     }
     const { data } = await api.get<PayeeSummary[]>("/analytics/payees", {
-        params: { limit },
+        params: month ? { limit, month } : { limit },
     });
     return data;
 }
