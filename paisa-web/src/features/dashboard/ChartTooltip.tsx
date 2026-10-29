@@ -1,41 +1,12 @@
 import { money } from "../../lib/format";
 
-/** One hue per category, used by every chart so a colour means the same
- *  thing on the donut, the trend and the legend. */
-export const CATEGORY_COLORS: Record<string, string> = {
-    food: "#2D4BBF",
-    groceries: "#0F6E68",
-    travel: "#C98A2B",
-    mobile: "#9FB0E8",
-    shopping: "#6B82DC",
-    health: "#B5453C",
-    other: "#8E95A6",
-    uncategorised: "#C9D0E4",
-    transfer: "#5A6070",
-};
-
-export const ACCENT = "#2D4BBF";
-export const GRID = "#EDEFF4";
-export const AXIS = "#5A6070";
-
-export function colorFor(name: string): string {
-    return CATEGORY_COLORS[name.toLowerCase()] ?? CATEGORY_COLORS.other;
-}
-
-export const MONTH_SHORT = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-export function monthTick(key: string): string {
-    return MONTH_SHORT[Number(key.slice(5, 7)) - 1] ?? key;
-}
+import { ACCENT, monthTick } from "./chartTheme";
 
 type TooltipRow = { name: string; value: number; color?: string };
 
 /** Recharts' default tooltip ignores the app's type and spacing, and
  *  prints raw paise. This one speaks rupees. */
-export function ChartTooltip({
+export default function ChartTooltip({
     active,
     payload,
     label,

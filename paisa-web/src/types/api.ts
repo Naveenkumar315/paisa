@@ -54,8 +54,8 @@ export interface ApiError {
 
 export interface MonthSummary {
     month: string;                 // "2026-09"
-    spending_paise: number;        // everyday payments
-    transfers_paise: number;       // person-to-person, kept out of spending
+    spending_paise: number;        // every payment out, transfers included
+    transfers_paise: number;       // the part of spending_paise sent to people
     received_paise: number;
     self_transfer_paise: number;   // between your own accounts, never counted
     txn_count: number;

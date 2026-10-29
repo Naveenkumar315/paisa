@@ -3,6 +3,7 @@ import {
     BarChart,
     CartesianGrid,
     Cell,
+    LabelList,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -11,13 +12,15 @@ import {
 
 import Card from "../../components/ui/Card";
 import { compact, money, moneyExact } from "../../lib/format";
+import { useUiStore } from "../../stores/ui";
 
 import type { TrendRow } from "./CategoryTrend";
-import { AXIS, GRID, monthTick } from "./chartTheme";
+import { AXIS, GRID, LABEL_STYLE, labelCompact, monthTick } from "./chartTheme";
+import { legendItemClass, useHidden } from "./useHidden";
 
-// Shades of the mobile hue, so the card still reads as "mobile" next to
-// the category charts while each plan stays distinguishable.
-const PLAN_SHADES = ["#2D4BBF", "#6B82DC", "#9FB0E8", "#C9D0E4"];
+// Shades of the mobile plum, light to dark, so the card still reads as
+// "mobile" next to the category charts while each plan stays distinguishable.
+const PLAN_SHADES = ["#A68AD2", "#8059B8", "#613F93", "#44296B"];
 
 export type RechargeRow = {
     month: string;
@@ -101,6 +104,10 @@ export default function MobileSpend({
     onSelect: (month: string) => void;
 }) {
     const plans = plansFrom(recharges);
+    const { hidden, toggle } = useHidden();
+    // Colours are assigned across every plan before hiding, so switching a
+    // plan off never repaints the ones that stay.
+    const visible = plans.filter((p) => !hidden.has(p.key));
     const byKey = new Map(plans.map((p) => [p.key, p]));
 
     // Months come from the trend, not the recharges, so a month with no
@@ -113,10 +120,14 @@ export default function MobileSpend({
             datum[plan.dataKey] = (datum[plan.dataKey] as number) + x.amount_paise * x.count;
             datum.counts[plan.key] = (datum.counts[plan.key] ?? 0) + x.count;
         }
+        datum.total = visible.reduce((sum, p) => sum + (datum[p.dataKey] as number), 0);
+        // The total hangs off the top non-empty plan; see CategoryTrend.
+        datum.top = [...visible].reverse().find((p) => (datum[p.dataKey] as number) > 0)?.dataKey;
         return datum;
     });
+    const showLabels = useUiStore((s) => s.showChartLabels);
 
-    const spentIn = (d: MonthDatum) => plans.reduce((sum, p) => sum + (d[p.dataKey] as number), 0);
+    const spentIn = (d: MonthDatum) => visible.reduce((sum, p) => sum + (d[p.dataKey] as number), 0);
     const current = data.find((d) => d.month === selected);
     const average = data.reduce((sum, d) => sum + spentIn(d), 0) / Math.max(data.length, 1);
 
@@ -140,7 +151,14 @@ export default function MobileSpend({
 
             <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1.5">
                 {plans.map((p) => (
-                    <span key={p.key} className="flex items-center gap-1.5 text-xs text-ink-3">
+                    <button
+                        key={p.key}
+                        type="button"
+                        aria-pressed={!hidden.has(p.key)}
+                        title={hidden.has(p.key) ? "Show this plan" : "Hide this plan"}
+                        onClick={() => toggle(p.key)}
+                        className={`flex cursor-pointer items-center gap-1.5 bg-transparent p-0 text-xs text-ink-3 ${legendItemClass(hidden.has(p.key))}`}
+                    >
                         <span
                             className="size-2 rounded-[2px]"
                             style={{ backgroundColor: p.color }}
@@ -148,14 +166,14 @@ export default function MobileSpend({
                         <span className="font-mono text-ink">{moneyExact(p.amount_paise)}</span>
                         <span>{p.payee}</span>
                         <span className="font-mono">×{p.total}</span>
-                    </span>
+                    </button>
                 ))}
             </div>
 
             <ResponsiveContainer width="100%" height={200}>
                 <BarChart
                     data={data}
-                    margin={{ top: 4, right: 8, bottom: 0, left: -12 }}
+                    margin={{ top: showLabels ? 20 : 4, right: 8, bottom: 0, left: -12 }}
                     onClick={(e) => {
                         const month = e?.activeLabel;
                         if (typeof month === "string") onSelect(month);
@@ -177,16 +195,16 @@ export default function MobileSpend({
                         tickLine={false}
                         width={52}
                     />
-                    <Tooltip content={<RechargeTooltip plans={plans} />} cursor={{ fill: GRID }} />
+                    <Tooltip content={<RechargeTooltip plans={visible} />} cursor={{ fill: GRID }} />
 
-                    {plans.map((p, i) => (
+                    {visible.map((p, i) => (
                         <Bar
                             key={p.key}
                             dataKey={p.dataKey}
                             name={planLabel(p)}
                             stackId="plans"
                             fill={p.color}
-                            radius={i === plans.length - 1 ? [4, 4, 0, 0] : undefined}
+                            radius={i === visible.length - 1 ? [4, 4, 0, 0] : undefined}
                         >
                             {/* Fade the other months rather than recolour the
                                 selected one, so each plan keeps its colour. */}
@@ -196,6 +214,17 @@ export default function MobileSpend({
                                     fillOpacity={d.month === selected ? 1 : 0.45}
                                 />
                             ))}
+                            {showLabels && (
+                                <LabelList
+                                    position="top"
+                                    valueAccessor={(entry) =>
+                                        entry.payload.top === p.dataKey
+                                            ? labelCompact(entry.payload.total)
+                                            : ""
+                                    }
+                                    style={LABEL_STYLE}
+                                />
+                            )}
                         </Bar>
                     ))}
                 </BarChart>

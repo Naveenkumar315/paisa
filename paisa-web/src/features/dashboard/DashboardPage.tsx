@@ -12,10 +12,12 @@ import StatementUpload from "../statements/StatementUpload";
 import CategoryDonut from "./CategoryDonut";
 import CategoryTrend, { type TrendRow } from "./CategoryTrend";
 import ClockPanel from "./ClockPanel";
+import LabelsToggle from "./LabelsToggle";
 import MobileSpend, { type RechargeRow } from "./MobileSpend";
 import PayeeTable, { type PayeeScope } from "./PayeeTable";
 import SpendHeatmap, { type DayRow } from "./SpendHeatmap";
 import SpendTrend from "./SpendTrend";
+import TransferTrend from "./TransferTrend";
 
 async function getDaily(): Promise<DayRow[]> {
   const { data } = await api.get<DayRow[]>("/analytics/daily");
@@ -105,6 +107,7 @@ export default function DashboardPage() {
             {m.txn_count} payments · click any month on the chart
           </p>
         </div>
+        <LabelsToggle />
         <StatementUpload variant="inline" />
       </div>
 
@@ -113,7 +116,7 @@ export default function DashboardPage() {
           <div className="mb-4 flex flex-wrap items-start gap-4">
             <div className="min-w-0 grow">
               <p className="mb-1.5 text-[13px] font-medium text-ink-3">
-                Everyday spending
+                Spending
               </p>
               <p className="mb-3 text-[46px] leading-none font-medium tracking-[-0.04em]">
                 {money(m.spending_paise)}
@@ -148,7 +151,7 @@ export default function DashboardPage() {
           <Stat
             label="Transfers out"
             value={money(m.transfers_paise)}
-            hint="Person-to-person, not purchases"
+            hint="Sent to people · included in spending"
           />
           <Stat
             label="Received"
@@ -165,31 +168,42 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {m.transfers_paise > m.spending_paise && (
+      {/* spending_paise already includes transfers, so the shop-only
+          figure is the difference. Flag the month when people outweigh it. */}
+      {m.transfers_paise * 2 > m.spending_paise && (
         <Card tone="warn">
           <p className="mb-1 text-sm font-semibold">
             {money(m.transfers_paise)} of this month went to people, not shops
           </p>
           <p className="text-[13.5px] leading-relaxed text-ink-2">
-            Counted as spending, this month would read{" "}
-            {money(m.spending_paise + m.transfers_paise)} and every other month
-            would look cheap beside it.
+            That is more than half of the {money(m.spending_paise)} spent. Shops
+            and services took {money(m.spending_paise - m.transfers_paise)}.
           </p>
         </Card>
       )}
 
       <div className="flex flex-wrap gap-4">
         {categories.data && categories.data.length > 0 && (
-          <CategoryDonut slices={categories.data} total={m.spending_paise} />
+          <CategoryDonut slices={categories.data} />
         )}
         {trend.data && trend.data.length > 0 && <CategoryTrend rows={trend.data} />}
+      </div>
+
+      {/* Their own row, so the wrap above can never split them. Side by side
+          from lg up; stacked below that, where the two would be too narrow. */}
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <div className="flex min-w-0 lg:w-[34%]">
+          <TransferTrend months={available} selected={month} onSelect={setSelectedMonth} />
+        </div>
         {trend.data && trend.data.length > 0 && (
-          <MobileSpend
-            rows={trend.data}
-            recharges={recharges.data ?? []}
-            selected={month}
-            onSelect={setSelectedMonth}
-          />
+          <div className="flex min-w-0 flex-1">
+            <MobileSpend
+              rows={trend.data}
+              recharges={recharges.data ?? []}
+              selected={month}
+              onSelect={setSelectedMonth}
+            />
+          </div>
         )}
       </div>
 

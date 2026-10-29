@@ -12,7 +12,7 @@ from typing import Any, Awaitable, Callable
 from beanie import PydanticObjectId
 
 from app.db.models import Transaction
-from app.services.analytics_service import _with_category
+from app.services.analytics_service import SPENDING_MATCH, _with_category
 from app.services.categorize_service import CATEGORIES
 
 logger = logging.getLogger("paisa")
@@ -44,9 +44,9 @@ TOOL_SCHEMAS: list[dict] = [
         "function": {
             "name": "get_spending",
             "description": (
-                "Total everyday spending for one month, optionally for one "
-                "category. Excludes transfers to people and movements between "
-                "the user's own accounts."
+                "Total spending for one month, optionally for one category. "
+                "Includes money sent to people (category 'transfer'); excludes "
+                "movements between the user's own accounts."
             ),
             "parameters": {
                 "type": "object",
@@ -193,7 +193,7 @@ async def get_spending(
     pipeline: list[dict] = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         _month_field(),
         {"$match": {"month": month}},
     ]
@@ -273,7 +273,7 @@ async def compare_months(
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         _month_field(),
         {"$match": {"month": {"$in": [month_a, month_b]}}},
         {
@@ -311,7 +311,7 @@ async def top_payees(
     pipeline: list[dict] = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
     ]
     if month:
         pipeline += [_month_field(), {"$match": {"month": month}}]
@@ -427,7 +427,7 @@ async def list_months(user_id: PydanticObjectId) -> dict:
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         _month_field(),
         {"$group": {"_id": "$month", "total": {"$sum": "$amount_paise"}}},
         {"$sort": {"_id": 1}},

@@ -1,5 +1,6 @@
 import {
     Area,
+    LabelList,
     AreaChart,
     CartesianGrid,
     ReferenceDot,
@@ -10,9 +11,11 @@ import {
 } from "recharts";
 
 import { compact } from "../../lib/format";
+import { useUiStore } from "../../stores/ui";
 import type { MonthSummary } from "../../types/api";
 
-import { ACCENT, AXIS, ChartTooltip, GRID, monthTick } from "./chartTheme";
+import ChartTooltip from "./ChartTooltip";
+import { ACCENT, AXIS, GRID, LABEL_STYLE, labelCompact, monthTick } from "./chartTheme";
 
 export default function SpendTrend({
     months,
@@ -28,12 +31,13 @@ export default function SpendTrend({
         spending: m.spending_paise,
     }));
     const current = data.find((d) => d.month === selected);
+    const showLabels = useUiStore((s) => s.showChartLabels);
 
     return (
         <ResponsiveContainer width="100%" height={220}>
             <AreaChart
                 data={data}
-                margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
+                margin={{ top: showLabels ? 22 : 8, right: 8, bottom: 0, left: -12 }}
                 onClick={(e) => {
                     const month = e?.activeLabel;
                     if (typeof month === "string") onSelect(month);
@@ -73,7 +77,17 @@ export default function SpendTrend({
                     fill="url(#spendFill)"
                     dot={{ r: 3, fill: ACCENT, strokeWidth: 0 }}
                     activeDot={{ r: 5 }}
-                />
+                >
+                    {showLabels && (
+                        <LabelList
+                            dataKey="spending"
+                            position="top"
+                            offset={10}
+                            formatter={labelCompact}
+                            style={LABEL_STYLE}
+                        />
+                    )}
+                </Area>
 
                 {/* The selected month is marked rather than recoloured, so the
             line keeps reading as one series. */}

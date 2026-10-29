@@ -6,6 +6,12 @@ from app.db.models import Transaction
 # certainly a transfer, but once the payee has a category that wins.
 TRANSFER_MIN_PAISE = 200_000
 
+# Money sent to people counts as spending. "transfer" stays its own
+# bucket so the dashboard can still say how much of the total went to
+# people; only self-transfers and credits are left out.
+SPENDING_BUCKETS = ["spending", "transfer"]
+SPENDING_MATCH = {"$match": {"bucket": {"$in": SPENDING_BUCKETS}}}
+
 
 def _with_category() -> list[dict]:
     """Attach each transaction's payee category, then bucket it.
@@ -118,7 +124,9 @@ async def monthly_summaries(user_id: PydanticObjectId) -> list[dict]:
         out.append(
             {
                 "month": row["_id"],
-                "spending_paise": spending.get("total", 0),
+                # transfers_paise is the part of spending_paise that went
+                # to people, not an extra amount on top of it.
+                "spending_paise": spending.get("total", 0) + transfer.get("total", 0),
                 "transfers_paise": transfer.get("total", 0),
                 "received_paise": totals.get("received", {}).get("total", 0),
                 "self_transfer_paise": totals.get("self", {}).get("total", 0),
@@ -129,11 +137,11 @@ async def monthly_summaries(user_id: PydanticObjectId) -> list[dict]:
 
 
 async def category_slices(user_id: PydanticObjectId, month: str) -> list[dict]:
-    """Spending by category for one month. Transfers are not spending."""
+    """Spending by category for one month, transfers to people included."""
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         {
             "$addFields": {
                 "month": {"$dateToString": {"format": "%Y-%m", "date": "$occurred_at"}}
@@ -170,7 +178,7 @@ async def category_trend(user_id: PydanticObjectId) -> list[dict]:
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         {
             "$group": {
                 "_id": {
@@ -202,7 +210,7 @@ async def daily_series(user_id: PydanticObjectId) -> list[dict]:
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         {
             "$group": {
                 "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$occurred_at"}},
@@ -297,12 +305,12 @@ async def payee_summaries(
 
 
 async def clock_buckets(user_id: PydanticObjectId) -> list[dict]:
-    """Spending by time of day. Everyday payments only — one large
-    transfer at 3am would otherwise own the night bucket."""
+    """Spending by time of day, counted in payments rather than rupees
+    so one large transfer does not dominate a bucket."""
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending"}},
+        SPENDING_MATCH,
         {
             "$group": {
                 "_id": {"$hour": "$occurred_at"},
