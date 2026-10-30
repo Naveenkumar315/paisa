@@ -41,15 +41,47 @@ If a tool returns an error, read it, fix the call and try again.
 Answer in two or three sentences. State the number, then the one thing
 that explains it. No preamble."""
 
+# Last few turns only. The whole history would grow the prompt without
+# bound, and a question about September rarely needs what was asked in
+# April.
+HISTORY_TURNS = 4
 
-async def ask(user_id: PydanticObjectId, question: str) -> dict:
-    run = AgentRun(user_id=user_id, question=question)
+
+async def ask(
+    user_id: PydanticObjectId,
+    question: str,
+    thread_id: PydanticObjectId | None = None,
+) -> dict:
+    run = AgentRun(user_id=user_id, question=question, thread_id=thread_id)
     await run.insert()
 
-    messages: list[dict] = [
-        {"role": "system", "content": SYSTEM},
-        {"role": "user", "content": question},
-    ]
+    messages: list[dict] = [{"role": "system", "content": SYSTEM}]
+
+    if thread_id is None:
+        # The opening run is the thread. No separate collection to keep
+        # in step with agent_runs.
+        thread_id = run.thread_id = run.id
+    else:
+        previous = (
+            await AgentRun.find(
+                AgentRun.user_id == user_id,
+                AgentRun.thread_id == thread_id,
+                AgentRun.id != run.id,
+            )
+            .sort(-AgentRun.created_at)
+            .limit(HISTORY_TURNS)
+            .to_list()
+        )
+        # Only the question and the final answer go back, not the tool
+        # calls. The model needs to know what was asked, not how it was
+        # worked out, and tool results would multiply the prompt.
+        for past in reversed(previous):
+            if past.answer is None:
+                continue
+            messages.append({"role": "user", "content": past.question})
+            messages.append({"role": "assistant", "content": past.answer})
+
+    messages.append({"role": "user", "content": question})
 
     started = time.perf_counter()
     tokens = 0
@@ -136,6 +168,7 @@ async def ask(user_id: PydanticObjectId, question: str) -> dict:
 
     return {
         "run_id": str(run.id),
+        "thread_id": str(thread_id),
         "answer": answer,
         "steps": step_no,
         "tokens": tokens,

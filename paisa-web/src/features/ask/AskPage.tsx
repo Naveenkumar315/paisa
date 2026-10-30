@@ -23,11 +23,13 @@ export default function AskPage() {
     const [turns, setTurns] = useState<Turn[]>([]);
     const [draft, setDraft] = useState("");
     const [openTrace, setOpenTrace] = useState<string | null>(null);
+    const [threadId, setThreadId] = useState<string | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
 
     const ask = useMutation({
-        mutationFn: askQuestion,
+        mutationFn: (question: string) => askQuestion(question, threadId ?? undefined),
         onSuccess: (res) => {
+            setThreadId(res.thread_id);
             setTurns((t) => [
                 ...t,
                 { role: "agent", text: res.answer, runId: res.run_id, steps: res.steps },
@@ -45,13 +47,28 @@ export default function AskPage() {
         ask.mutate(text);
     }
 
+    function newConversation() {
+        setTurns([]);
+        setThreadId(null);
+        setOpenTrace(null);
+    }
+
     return (
         <div className="mx-auto flex max-w-3xl flex-col gap-5 px-8 py-7 pb-14">
-            <div>
-                <h1 className="mb-1.5 text-[30px] leading-tight font-semibold tracking-[-0.03em]">Ask your data</h1>
-                <p className="text-[13.5px] text-ink-3">
-                    Every number comes from a query, not from the model.
-                </p>
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="mb-1.5 text-[30px] leading-tight font-semibold tracking-[-0.03em]">Ask your data</h1>
+                    <p className="text-[13.5px] text-ink-3">
+                        Every number comes from a query, not from the model.
+                    </p>
+                </div>
+                {turns.length > 0 && (
+                    // Disabled mid-answer: the reply would land in the cleared
+                    // page and drag the old thread back in.
+                    <Button variant="secondary" disabled={ask.isPending} onClick={newConversation}>
+                        New conversation
+                    </Button>
+                )}
             </div>
 
             {turns.length === 0 && (

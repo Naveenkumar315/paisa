@@ -12,11 +12,42 @@ router = APIRouter(prefix="/ask", tags=["ask"])
 
 class AskIn(BaseModel):
     question: str = Field(min_length=3, max_length=500)
+    thread_id: str | None = None
 
 
 @router.post("")
 async def ask(body: AskIn, user: User = Depends(get_current_user)):
-    return await agent_service.ask(user.id, body.question)
+    thread_id = PydanticObjectId(body.thread_id) if body.thread_id else None
+    return await agent_service.ask(user.id, body.question, thread_id)
+
+
+@router.get("/threads")
+async def list_threads(user: User = Depends(get_current_user)):
+    pipeline = [
+        # Runs from before threads existed have no thread_id and would
+        # otherwise collapse into one null group.
+        {"$match": {"user_id": user.id, "thread_id": {"$ne": None}}},
+        {"$sort": {"created_at": 1}},
+        {
+            "$group": {
+                "_id": "$thread_id",
+                "title": {"$first": "$question"},
+                "runs": {"$sum": 1},
+                "last_at": {"$max": "$created_at"},
+            }
+        },
+        {"$sort": {"last_at": -1}},
+    ]
+    rows = await AgentRun.aggregate(pipeline).to_list()
+    return [
+        {
+            "thread_id": str(r["_id"]),
+            "title": r["title"],
+            "runs": r["runs"],
+            "last_at": r["last_at"],
+        }
+        for r in rows
+    ]
 
 
 @router.get("/runs")

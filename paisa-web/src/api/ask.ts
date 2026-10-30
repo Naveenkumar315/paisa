@@ -3,6 +3,7 @@ import { api } from "./client";
 // Append these to src/types/api.ts
 export interface AskResponse {
     run_id: string;
+    thread_id: string;
     answer: string;
     steps: number;
     tokens: number;
@@ -28,8 +29,14 @@ export interface RunTrace {
     trace: TraceStep[];
 }
 
-export async function askQuestion(question: string): Promise<AskResponse> {
-    const { data } = await api.post<AskResponse>("/ask", { question });
+export async function askQuestion(
+    question: string,
+    threadId?: string
+): Promise<AskResponse> {
+    const { data } = await api.post<AskResponse>("/ask", {
+        question,
+        ...(threadId && { thread_id: threadId }),
+    });
     return data;
 }
 
