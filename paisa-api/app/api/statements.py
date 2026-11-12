@@ -1,9 +1,13 @@
+import logging
+
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 
 from app.api.deps import get_current_user
 from app.db.models import Statement, Transaction, User
 from app.schemas.statements import StatementOut, TransactionOut, TransactionPage
-from app.services import import_service
+from app.services import categorize_service, import_service
+
+logger = logging.getLogger("paisa")
 
 router = APIRouter(prefix="/statements", tags=["statements"])
 
@@ -30,6 +34,14 @@ async def upload_statement(
     statement = await import_service.import_statement(
         user.id, file.filename or "statement.pdf", data
     )
+    if statement.rows_inserted:
+        # Without this, new payees have no category until someone presses
+        # Re-run on the Payees page. A model failure must not lose the
+        # import, so log it and leave Re-run as the way to retry.
+        try:
+            await categorize_service.categorize_all(user.id, only_new=True)
+        except Exception:
+            logger.exception("categorise_after_upload_failed user=%s", user.id)
     return _out(statement)
 
 

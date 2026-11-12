@@ -123,14 +123,22 @@ def _describe(name: str, s: dict) -> str:
     return line
 
 
-async def categorize_all(user_id: PydanticObjectId) -> dict:
+async def categorize_all(user_id: PydanticObjectId, only_new: bool = False) -> dict:
+    """Categorise payees with the model.
+
+    only_new=True asks only about payees with no category yet, which is
+    what an upload needs: the ones already labelled keep their label and
+    cost no model calls. The Re-run button passes False to revisit every
+    payee the person has not labelled themselves.
+    """
     stats = await _payee_stats(user_id)
 
     # Never re-ask about a payee the person has already labelled.
     existing = await Payee.find(Payee.user_id == user_id).to_list()
     decided = {p.name for p in existing if p.source == "user"}
+    skip = {p.name for p in existing} if only_new else decided
 
-    todo = [n for n in stats if n not in decided]
+    todo = [n for n in stats if n not in skip]
     logger.info("categorising %s payees", len(todo))
 
     results: dict[str, str] = {}
