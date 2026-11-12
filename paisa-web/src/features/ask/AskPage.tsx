@@ -91,7 +91,7 @@ export default function AskPage() {
                     turn.role === "user" ? (
                         <p
                             key={i}
-                            className="max-w-lg self-end rounded-2xl rounded-br-sm bg-accent px-4 py-3 text-[15px] leading-relaxed text-white"
+                            className="max-w-lg self-end rounded-2xl rounded-br-sm bg-accent px-4 py-3 text-[15px] leading-relaxed text-on-accent"
                         >
                             {turn.text}
                         </p>

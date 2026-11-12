@@ -16,7 +16,10 @@ const DAYS = ["Mon", "", "Wed", "", "Fri", "", "Sun"];
 
 // Five steps, light to dark. A continuous scale looks precise and is
 // unreadable; five buckets are something the eye can actually compare.
-const SHADES = ["#EDEFF4", "#C9D4F2", "#9FB0E8", "#6B82DC", "#2D4BBF"];
+const SHADES = [
+    "var(--chart-blue-0)", "var(--chart-blue-1)", "var(--chart-blue-2)",
+    "var(--chart-blue-3)", "var(--chart-blue-4)",
+];
 
 const MONTH_SHORT = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -125,7 +128,7 @@ export default function SpendHeatmap({ days }: { days: DayRow[] }) {
                                 x={0}
                                 y={i * STEP + 22}
                                 fontSize={10}
-                                fill="#5A6070"
+                                fill="var(--chart-axis)"
                             >
                                 {d}
                             </text>
@@ -138,7 +141,7 @@ export default function SpendHeatmap({ days }: { days: DayRow[] }) {
                             x={m.x + 32}
                             y={9}
                             fontSize={10}
-                            fill="#5A6070"
+                            fill="var(--chart-axis)"
                         >
                             {m.text}
                         </text>

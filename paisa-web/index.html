@@ -6,6 +6,17 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Paisa</title>
+  <script>
+    // Apply the saved theme before first paint, so a dark-mode reload
+    // never flashes white. Same key and rules as src/stores/theme.ts.
+    try {
+      var saved = JSON.parse(localStorage.getItem("paisa-theme") || "{}");
+      var t = (saved.state && saved.state.theme) || "system";
+      if (t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+    } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">

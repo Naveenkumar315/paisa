@@ -20,7 +20,9 @@ import { legendItemClass, useHidden } from "./useHidden";
 
 // Shades of the mobile plum, light to dark, so the card still reads as
 // "mobile" next to the category charts while each plan stays distinguishable.
-const PLAN_SHADES = ["#A68AD2", "#8059B8", "#613F93", "#44296B"];
+const PLAN_SHADES = [
+    "var(--chart-plan-0)", "var(--chart-plan-1)", "var(--chart-plan-2)", "var(--chart-plan-3)",
+];
 
 export type RechargeRow = {
     month: string;

@@ -3,7 +3,9 @@ import Card from "../../components/ui/Card";
 import { money } from "../../lib/format";
 import type { ClockBucket } from "../../types/api";
 
-const SHADES = ["#2D4BBF", "#5E78D8", "#9FB0E8", "#C9D0E4"];
+const SHADES = [
+    "var(--chart-blue-4)", "var(--chart-blue-3b)", "var(--chart-blue-2)", "var(--chart-bar)",
+];
 
 export default function ClockPanel({ buckets }: { buckets: ClockBucket[] }) {
   const sorted = [...buckets].sort((a, b) => b.count - a.count);

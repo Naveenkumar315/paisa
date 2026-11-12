@@ -38,7 +38,7 @@ export default function RegisterPage() {
         <div className="flex min-h-screen items-center justify-center bg-ground px-4 py-10">
             <div className="w-full max-w-sm">
                 <div className="mb-8 flex items-center gap-2.5">
-                    <span className="inline-flex size-8 items-center justify-center rounded-[9px] bg-accent text-base font-bold text-white">
+                    <span className="inline-flex size-8 items-center justify-center rounded-[9px] bg-accent text-base font-bold text-on-accent">
                         P
                     </span>
                     <span className="text-xl font-semibold tracking-[-0.03em]">Paisa</span>

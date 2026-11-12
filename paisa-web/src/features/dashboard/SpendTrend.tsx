@@ -97,7 +97,7 @@ export default function SpendTrend({
                         y={current.spending}
                         r={6}
                         fill={ACCENT}
-                        stroke="#FFFFFF"
+                        stroke="var(--chart-dot-ring)"
                         strokeWidth={2}
                     />
                 )}

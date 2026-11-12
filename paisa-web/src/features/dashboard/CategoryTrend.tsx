@@ -130,8 +130,8 @@ export default function CategoryTrend({ rows }: { rows: TrendRow[] }) {
                                         valueAccessor={(entry) =>
                                             entry.payload.top === c
                                                 ? labelCompact(
-                                                      entry.payload.total,
-                                                  )
+                                                    entry.payload.total,
+                                                )
                                                 : ""
                                         }
                                         style={LABEL_STYLE}

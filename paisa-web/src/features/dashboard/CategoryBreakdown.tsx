@@ -5,17 +5,17 @@ import type { CategorySlice } from "../../types/api";
 // Uncategorised gets its own amber so it reads as a gap to close, not as
 // just another spending category.
 const COLORS: Record<string, string> = {
-  Food: "#2D4BBF",
-  Shopping: "#6B82DC",
-  Mobile: "#9FB0E8",
-  Groceries: "#0F6E68",
-  Travel: "#C98A2B",
-  Health: "#B5453C",
-  Transfer: "#5A6070",
-  Other: "#C9D0E4",
-  Uncategorised: "#C9D0E4",
+  Food: "var(--chart-blue-4)",
+  Shopping: "var(--chart-blue-3)",
+  Mobile: "var(--chart-blue-2)",
+  Groceries: "var(--chart-bd-groceries)",
+  Travel: "var(--chart-bd-travel)",
+  Health: "var(--chart-bd-health)",
+  Transfer: "var(--chart-bd-transfer)",
+  Other: "var(--chart-bar)",
+  Uncategorised: "var(--chart-bar)",
 };
-const FALLBACK = "#9AA0AE";
+const FALLBACK = "var(--chart-bd-fallback)";
 
 export default function CategoryBreakdown({
   slices,

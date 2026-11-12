@@ -44,7 +44,7 @@ export default function MonthChart({
               <span
                 className={cn(
                   "w-full rounded-t-md transition-colors",
-                  isSelected ? "bg-accent" : "bg-[#C9D0E4] hover:bg-[#B4BEDC]"
+                  isSelected ? "bg-accent" : "bg-(--chart-bar) hover:bg-(--chart-bar-hover)"
                 )}
                 style={{ height }}
               />

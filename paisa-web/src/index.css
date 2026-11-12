@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Dark mode is a class on <html>, set by stores/theme.ts (and by the
+   inline script in index.html before first paint), so the person's
+   choice can override the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --color-ground: #F4F5F8;
     --color-surface: #FFFFFF;
@@ -11,6 +16,9 @@
     --color-accent: #2D4BBF;
     --color-accent-ink: #1E3490;
     --color-accent-bg: #EEF1FA;
+    /* Text on an accent fill. White here; dark in dark mode, where the
+       accent is light enough that white on it would not read. */
+    --color-on-accent: #FFFFFF;
     --color-warn-ink: #7A4A00;
     --color-warn-bg: #FFF4E4;
     --color-warn-line: #F0CF9B;
@@ -24,8 +32,111 @@
     --shadow-card: 0 1px 2px rgb(21 23 28 / 0.04), 0 8px 24px -12px rgb(21 23 28 / 0.10);
 }
 
+/* Chart colours. SVG fill/stroke and inline styles read these through
+   var(), so charts follow the theme with no React re-render. Names are
+   referenced from features/dashboard/chartTheme.ts. */
+:root {
+    color-scheme: light;
+
+    --chart-grid: var(--color-line-soft);
+    --chart-axis: var(--color-ink-3);
+    --chart-label: var(--color-ink-2);
+    --chart-accent: var(--color-accent);
+    --chart-dot-ring: var(--color-surface);
+
+    --chart-transfer: #5E5650;
+    --chart-food: #3A62B0;
+    --chart-groceries: #4E8A5A;
+    --chart-travel: #DDAA45;
+    --chart-shopping: #C0664A;
+    --chart-health: #24676A;
+    --chart-mobile: #8059B8;
+    --chart-other: #A39E92;
+    --chart-uncategorised: #D6D2C8;
+
+    /* Blue ramp, faint to strong: heatmap, clock, month bars, breakdown. */
+    --chart-blue-0: #EDEFF4;
+    --chart-blue-1: #C9D4F2;
+    --chart-blue-2: #9FB0E8;
+    --chart-blue-3: #6B82DC;
+    --chart-blue-3b: #5E78D8;
+    --chart-blue-4: #2D4BBF;
+    --chart-bar: #C9D0E4;
+    --chart-bar-hover: #B4BEDC;
+
+    /* Breakdown bar, which has its own palette. */
+    --chart-bd-groceries: #0F6E68;
+    --chart-bd-travel: #C98A2B;
+    --chart-bd-health: #B5453C;
+    --chart-bd-transfer: #5A6070;
+    --chart-bd-fallback: #9AA0AE;
+
+    /* Mobile plans, light to deep. */
+    --chart-plan-0: #A68AD2;
+    --chart-plan-1: #8059B8;
+    --chart-plan-2: #613F93;
+    --chart-plan-3: #44296B;
+}
+
+.dark {
+    color-scheme: dark;
+
+    --color-ground: #0F1115;
+    --color-surface: #171A20;
+    --color-line: #2A2F39;
+    --color-line-soft: #22262E;
+    --color-ink: #E8EAEE;
+    --color-ink-2: #B4B9C4;
+    --color-ink-3: #9198A5;
+    --color-accent: #8199F0;
+    --color-accent-ink: #A9B8F5;
+    --color-accent-bg: #1D2440;
+    --color-on-accent: #0E1222;
+    --color-warn-ink: #F0C27A;
+    --color-warn-bg: #2A2112;
+    --color-warn-line: #5C4520;
+    --color-good-ink: #7FD1B5;
+    --color-good-bg: #12271F;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.30), 0 8px 24px -12px rgb(0 0 0 / 0.50);
+
+    /* Same hues as light mode, lifted so they read on a dark surface. */
+    --chart-transfer: #A1978F;
+    --chart-food: #6F93DB;
+    --chart-groceries: #6FAE7B;
+    --chart-travel: #DDAA45;
+    --chart-shopping: #D9805F;
+    --chart-health: #42A0A3;
+    --chart-mobile: #A07DD6;
+    --chart-other: #847F75;
+    --chart-uncategorised: #4A4740;
+
+    /* The ramp runs from the surface up to the bright accent, so "more"
+       still means "stronger" on a dark ground. */
+    --chart-blue-0: #22262E;
+    --chart-blue-1: #26345E;
+    --chart-blue-2: #35509A;
+    --chart-blue-3: #5470D0;
+    --chart-blue-3b: #5E78D8;
+    --chart-blue-4: #8199F0;
+    --chart-bar: #2E3854;
+    --chart-bar-hover: #3B486E;
+
+    --chart-bd-groceries: #3FA29B;
+    --chart-bd-travel: #D9A04A;
+    --chart-bd-health: #D7695F;
+    --chart-bd-transfer: #8A91A0;
+    --chart-bd-fallback: #6B7180;
+
+    --chart-plan-0: #C6B1EA;
+    --chart-plan-1: #A07DD6;
+    --chart-plan-2: #7E5BB5;
+    --chart-plan-3: #5E4190;
+}
+
 body {
     margin: 0;
+    background: var(--color-ground);
+    color: var(--color-ink);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.005em;
     -webkit-font-smoothing: antialiased;
