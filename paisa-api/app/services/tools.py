@@ -15,7 +15,7 @@ from app.db.models import Transaction
 from app.services.analytics_service import SPENDING_MATCH, _with_category
 from app.services.categorize_service import CATEGORIES
 
-logger = logging.getLogger("paisa")
+logger = logging.getLogger("outflow")
 
 MONTH_PATTERN = r"^\d{4}-\d{2}$"
 

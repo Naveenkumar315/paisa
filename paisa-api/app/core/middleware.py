@@ -4,7 +4,7 @@ import uuid
 
 from fastapi import FastAPI, Request
 
-logger = logging.getLogger("paisa")
+logger = logging.getLogger("outflow")
 
 
 def register_middleware(app: FastAPI) -> None:

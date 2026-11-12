@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     logger.info("shutdown complete")
 
 setup_logging(settings.log_level)
-logger = logging.getLogger("paisa")
+logger = logging.getLogger("outflow")
 
 app = FastAPI(title=settings.app_name, version="0.1.0", lifespan=lifespan)
 

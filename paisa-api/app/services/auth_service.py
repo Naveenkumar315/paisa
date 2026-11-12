@@ -7,7 +7,7 @@ from app.core.security import hash_password, verify_password
 from app.db.models import User
 from app.schemas.auth import LoginIn, RegisterIn
 
-logger = logging.getLogger("paisa")
+logger = logging.getLogger("outflow")
 
 
 async def register_user(data: RegisterIn) -> User:

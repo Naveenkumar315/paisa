@@ -18,7 +18,7 @@ from app.db.models import AgentRun, AgentStep
 from app.services.llm import chat_with_tools
 from app.services.tools import TOOL_SCHEMAS, run_tool
 
-logger = logging.getLogger("paisa")
+logger = logging.getLogger("outflow")
 
 # Eight tool calls is more than any question here needs. Without a cap a
 # model that keeps re-querying the same month runs until the context

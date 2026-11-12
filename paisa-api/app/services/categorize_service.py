@@ -6,7 +6,7 @@ from beanie import PydanticObjectId
 from app.db.models import Payee, Transaction
 from app.services.llm import complete_json
 
-logger = logging.getLogger("paisa")
+logger = logging.getLogger("outflow")
 
 CATEGORIES = [
     "food", "groceries", "travel", "mobile",

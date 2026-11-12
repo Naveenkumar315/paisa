@@ -23,9 +23,9 @@ export default function AppShell() {
             <aside className="sticky top-0 flex h-screen min-w-0 flex-[0_0_232px] flex-col gap-7 overflow-y-auto border-r border-line bg-surface px-4 py-6">
                 <div className="flex items-center gap-2.5 px-2">
                     <span className="inline-flex size-[30px] items-center justify-center rounded-[9px] bg-accent text-[15px] font-bold text-on-accent">
-                        P
+                        O
                     </span>
-                    <span className="text-[17px] font-semibold tracking-[-0.03em]">Paisa</span>
+                    <span className="text-[17px] font-semibold tracking-[-0.03em]">Outflow</span>
                 </div>
 
                 <nav className="flex flex-col gap-0.5">

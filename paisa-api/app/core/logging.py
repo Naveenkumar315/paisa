@@ -10,7 +10,7 @@ FORMAT = "%(asctime)s %(levelname)-7s [%(name)s] %(message)s"
 def setup_logging(level: str = "INFO") -> None:
     LOG_DIR.mkdir(exist_ok=True)
 
-    logger = logging.getLogger("paisa")
+    logger = logging.getLogger("outflow")
     logger.setLevel(level)
     logger.handlers.clear()
 

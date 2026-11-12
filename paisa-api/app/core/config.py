@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "Paisa"
+    app_name: str = "Outflow"
     env: str = "local"
     log_level: str = "INFO"
 
