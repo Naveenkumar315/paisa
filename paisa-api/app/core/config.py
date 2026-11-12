@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60 * 24
 
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000"]
     max_upload_mb: int = 20
     gemini_api_key: str = ""
     embedding_model: str = "gemini-embedding-001"
