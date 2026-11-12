@@ -3,21 +3,21 @@ import { compact } from "../../lib/format";
 /** One hue per category, used by every chart so a colour means the same
  *  thing on the donut, the trend and the legend. */
 export const CATEGORY_COLORS: Record<string, string> = {
-    transfer: "var(--chart-transfer)",
-    food: "var(--chart-food)",
-    groceries: "var(--chart-groceries)",
+    health: "var(--chart-health)",
     travel: "var(--chart-travel)",
     shopping: "var(--chart-shopping)",
-    health: "var(--chart-health)",
+    transfer: "var(--chart-transfer)",
+    groceries: "var(--chart-groceries)",
     mobile: "var(--chart-mobile)",
+    food: "var(--chart-food)",
     other: "var(--chart-other)",
     uncategorised: "var(--chart-uncategorised)",
 };
 
-/** The order categories are drawn in, on every chart. The colours were
- *  checked for colour-blind separation as neighbours in exactly this
- *  order (ochre sits away from terracotta, plum away from stone),
- *  so stacks and the donut must not re-sort by size. */
+/** The order categories are drawn in, on every chart. The palette was
+ *  validated for colour-blind separation between neighbours in exactly
+ *  this order (values in index.css), so stacks and the donut must not
+ *  re-sort by size, and reordering here means re-running the validator. */
 export const CATEGORY_ORDER = Object.keys(CATEGORY_COLORS);
 
 export function categoryRank(name: string): number {

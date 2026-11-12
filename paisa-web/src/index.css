@@ -13,17 +13,17 @@
     --color-ink: #15171C;
     --color-ink-2: #4B5160;
     --color-ink-3: #5A6070;
-    --color-accent: #2D4BBF;
-    --color-accent-ink: #1E3490;
-    --color-accent-bg: #EEF1FA;
+    --color-accent: #4F46E5;
+    --color-accent-ink: #4338CA;
+    --color-accent-bg: #EEF0FF;
     /* Text on an accent fill. White here; dark in dark mode, where the
        accent is light enough that white on it would not read. */
     --color-on-accent: #FFFFFF;
-    --color-warn-ink: #7A4A00;
-    --color-warn-bg: #FFF4E4;
-    --color-warn-line: #F0CF9B;
-    --color-good-ink: #0D5240;
-    --color-good-bg: #E7F2EE;
+    --color-warn-ink: #92400E;
+    --color-warn-bg: #FEF3E2;
+    --color-warn-line: #F6CF8F;
+    --color-good-ink: #047857;
+    --color-good-bg: #E3F5EC;
     --font-sans: Geist, "Inter", system-ui, sans-serif;
     --font-mono: "Geist Mono", ui-monospace, monospace;
 
@@ -44,38 +44,44 @@
     --chart-accent: var(--color-accent);
     --chart-dot-ring: var(--color-surface);
 
-    --chart-transfer: #5E5650;
-    --chart-food: #3A62B0;
-    --chart-groceries: #4E8A5A;
-    --chart-travel: #DDAA45;
-    --chart-shopping: #C0664A;
-    --chart-health: #24676A;
-    --chart-mobile: #8059B8;
-    --chart-other: #A39E92;
-    --chart-uncategorised: #D6D2C8;
+    /* Category palette ("Vivid"), assigned in CATEGORY_ORDER (chartTheme.ts).
+       Every ordering was run through the dataviz palette validator and this
+       one kept: in both modes each pair of neighbours in a stack or the donut
+       stays apart under colour-blind simulation (worst ΔE 15). Other and
+       Uncategorised are deliberately neutral grey: they are buckets, not
+       categories, and should recede. */
+    --chart-health: #0891B2;
+    --chart-travel: #F59E0B;
+    --chart-shopping: #DB2777;
+    --chart-transfer: #6366F1;
+    --chart-groceries: #059669;
+    --chart-mobile: #9333EA;
+    --chart-food: #F43F5E;
+    --chart-other: #8F8E88;
+    --chart-uncategorised: #C9C8C2;
 
-    /* Blue ramp, faint to strong: heatmap, clock, month bars, breakdown. */
+    /* Indigo ramp (Vivid's indigo), faint to strong: heatmap and month bars.
+       Step 0 is the empty cell and stays neutral. */
     --chart-blue-0: #EDEFF4;
-    --chart-blue-1: #C9D4F2;
-    --chart-blue-2: #9FB0E8;
-    --chart-blue-3: #6B82DC;
-    --chart-blue-3b: #5E78D8;
-    --chart-blue-4: #2D4BBF;
-    --chart-bar: #C9D0E4;
-    --chart-bar-hover: #B4BEDC;
+    --chart-blue-1: #C7CBFB;
+    --chart-blue-2: #A0A6F7;
+    --chart-blue-3: #6366F1;
+    --chart-blue-4: #4338CA;
+    /* Clock: discrete ranked bars, strongest first. Unlike the heatmap, the
+       faintest step must still read as a bar, so it stays >= 2:1. */
+    --chart-clock-0: #4338CA;
+    --chart-clock-1: #5B55EC;
+    --chart-clock-2: #7B80F4;
+    --chart-clock-3: #A3A8F8;
+    --chart-bar: #D5D8FB;
+    --chart-bar-hover: #BEC2F8;
 
-    /* Breakdown bar, which has its own palette. */
-    --chart-bd-groceries: #0F6E68;
-    --chart-bd-travel: #C98A2B;
-    --chart-bd-health: #B5453C;
-    --chart-bd-transfer: #5A6070;
-    --chart-bd-fallback: #9AA0AE;
 
     /* Mobile plans, light to deep. */
-    --chart-plan-0: #A68AD2;
-    --chart-plan-1: #8059B8;
-    --chart-plan-2: #613F93;
-    --chart-plan-3: #44296B;
+    --chart-plan-0: #C084FC;
+    --chart-plan-1: #9333EA;
+    --chart-plan-2: #7E22CE;
+    --chart-plan-3: #581C87;
 }
 
 .dark {
@@ -88,49 +94,48 @@
     --color-ink: #E8EAEE;
     --color-ink-2: #B4B9C4;
     --color-ink-3: #9198A5;
-    --color-accent: #8199F0;
-    --color-accent-ink: #A9B8F5;
-    --color-accent-bg: #1D2440;
+    --color-accent: #8B8FF8;
+    --color-accent-ink: #A5A9FA;
+    --color-accent-bg: #23244A;
     --color-on-accent: #0E1222;
-    --color-warn-ink: #F0C27A;
-    --color-warn-bg: #2A2112;
-    --color-warn-line: #5C4520;
-    --color-good-ink: #7FD1B5;
-    --color-good-bg: #12271F;
+    --color-warn-ink: #F5B94A;
+    --color-warn-bg: #2C2110;
+    --color-warn-line: #5E4519;
+    --color-good-ink: #5FD4A4;
+    --color-good-bg: #0F2A21;
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.30), 0 8px 24px -12px rgb(0 0 0 / 0.50);
 
-    /* Same hues as light mode, lifted so they read on a dark surface. */
-    --chart-transfer: #A1978F;
-    --chart-food: #6F93DB;
-    --chart-groceries: #6FAE7B;
-    --chart-travel: #DDAA45;
-    --chart-shopping: #D9805F;
-    --chart-health: #42A0A3;
-    --chart-mobile: #A07DD6;
-    --chart-other: #847F75;
-    --chart-uncategorised: #4A4740;
+    /* Same seven hues, stepped for the dark surface and validated against
+       #171A20: all inside the dark lightness band and clear 3:1. */
+    --chart-health: #0E9FBF;
+    --chart-travel: #C98500;
+    --chart-shopping: #DB4C92;
+    --chart-transfer: #7A7EF5;
+    --chart-groceries: #10A574;
+    --chart-mobile: #A15BEF;
+    --chart-food: #E5485F;
+    --chart-other: #7A7973;
+    --chart-uncategorised: #3D3C38;
 
-    /* The ramp runs from the surface up to the bright accent, so "more"
+    /* The ramp runs from the surface up to the bright indigo, so "more"
        still means "stronger" on a dark ground. */
     --chart-blue-0: #22262E;
-    --chart-blue-1: #26345E;
-    --chart-blue-2: #35509A;
-    --chart-blue-3: #5470D0;
-    --chart-blue-3b: #5E78D8;
-    --chart-blue-4: #8199F0;
-    --chart-bar: #2E3854;
-    --chart-bar-hover: #3B486E;
+    --chart-blue-1: #2E3170;
+    --chart-blue-2: #4447B0;
+    --chart-blue-3: #6E72F2;
+    --chart-blue-4: #A5A9FA;
+    --chart-clock-0: #B4B7FB;
+    --chart-clock-1: #8F93F8;
+    --chart-clock-2: #6E72F2;
+    --chart-clock-3: #4E52C8;
+    --chart-bar: #2C2F5C;
+    --chart-bar-hover: #3A3E78;
 
-    --chart-bd-groceries: #3FA29B;
-    --chart-bd-travel: #D9A04A;
-    --chart-bd-health: #D7695F;
-    --chart-bd-transfer: #8A91A0;
-    --chart-bd-fallback: #6B7180;
 
-    --chart-plan-0: #C6B1EA;
-    --chart-plan-1: #A07DD6;
-    --chart-plan-2: #7E5BB5;
-    --chart-plan-3: #5E4190;
+    --chart-plan-0: #D4B0FB;
+    --chart-plan-1: #B07BF4;
+    --chart-plan-2: #8E4FE0;
+    --chart-plan-3: #7036C4;
 }
 
 body {

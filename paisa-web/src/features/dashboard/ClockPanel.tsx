@@ -4,7 +4,7 @@ import { money } from "../../lib/format";
 import type { ClockBucket } from "../../types/api";
 
 const SHADES = [
-    "var(--chart-blue-4)", "var(--chart-blue-3b)", "var(--chart-blue-2)", "var(--chart-bar)",
+    "var(--chart-clock-0)", "var(--chart-clock-1)", "var(--chart-clock-2)", "var(--chart-clock-3)",
 ];
 
 export default function ClockPanel({ buckets }: { buckets: ClockBucket[] }) {

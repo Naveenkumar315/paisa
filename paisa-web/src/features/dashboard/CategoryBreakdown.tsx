@@ -1,21 +1,7 @@
 import Card from "../../components/ui/Card";
 import { money } from "../../lib/format";
 import type { CategorySlice } from "../../types/api";
-
-// Uncategorised gets its own amber so it reads as a gap to close, not as
-// just another spending category.
-const COLORS: Record<string, string> = {
-  Food: "var(--chart-blue-4)",
-  Shopping: "var(--chart-blue-3)",
-  Mobile: "var(--chart-blue-2)",
-  Groceries: "var(--chart-bd-groceries)",
-  Travel: "var(--chart-bd-travel)",
-  Health: "var(--chart-bd-health)",
-  Transfer: "var(--chart-bd-transfer)",
-  Other: "var(--chart-bar)",
-  Uncategorised: "var(--chart-bar)",
-};
-const FALLBACK = "var(--chart-bd-fallback)";
+import { colorFor } from "./chartTheme";
 
 export default function CategoryBreakdown({
   slices,
@@ -34,7 +20,7 @@ export default function CategoryBreakdown({
         {slices.map((s) => (
           <span
             key={s.name}
-            style={{ width: `${s.pct}%`, backgroundColor: COLORS[s.name] ?? FALLBACK }}
+            style={{ width: `${s.pct}%`, backgroundColor: colorFor(s.name) }}
           />
         ))}
       </div>
@@ -44,7 +30,7 @@ export default function CategoryBreakdown({
           <div key={s.name} className="flex items-baseline gap-2.5">
             <span
               className="size-2.5 shrink-0 rounded-[3px]"
-              style={{ backgroundColor: COLORS[s.name] ?? FALLBACK }}
+              style={{ backgroundColor: colorFor(s.name) }}
             />
             <span className="min-w-0 grow text-sm font-medium">{s.name}</span>
             <span className="text-[13px] text-ink-3">{s.pct}%</span>
