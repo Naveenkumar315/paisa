@@ -39,9 +39,9 @@ export default function RegisterPage() {
             <div className="w-full max-w-sm">
                 <div className="mb-8 flex items-center gap-2.5">
                     <span className="inline-flex size-8 items-center justify-center rounded-[9px] bg-accent text-base font-bold text-on-accent">
-                        O
+                        M
                     </span>
-                    <span className="text-xl font-semibold tracking-[-0.03em]">Outflow</span>
+                    <span className="text-xl font-semibold tracking-[-0.03em]">Moneytrail</span>
                 </div>
 
                 <div className="rounded-2xl border border-line bg-surface p-7">

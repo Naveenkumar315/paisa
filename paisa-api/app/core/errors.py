@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-logger = logging.getLogger("outflow")
+logger = logging.getLogger("moneytrail")
 
 
 class AppError(Exception):

@@ -5,7 +5,7 @@ from openai import AsyncAzureOpenAI
 
 from app.core.config import settings
 
-logger = logging.getLogger("outflow")
+logger = logging.getLogger("moneytrail")
 
 _client = AsyncAzureOpenAI(
     azure_endpoint=settings.azure_openai_endpoint,

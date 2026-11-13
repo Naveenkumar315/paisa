@@ -7,7 +7,7 @@ from app.db.models import Statement, Transaction, User
 from app.schemas.statements import StatementOut, TransactionOut, TransactionPage
 from app.services import categorize_service, import_service
 
-logger = logging.getLogger("outflow")
+logger = logging.getLogger("moneytrail")
 
 router = APIRouter(prefix="/statements", tags=["statements"])
 

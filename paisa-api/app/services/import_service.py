@@ -10,7 +10,7 @@ from app.core.errors import AppError
 from app.db.models import Statement, Transaction
 from app.services.gpay_parser import ParsedTxn, parse_statement
 
-logger = logging.getLogger("outflow")
+logger = logging.getLogger("moneytrail")
 
 DUPLICATE_KEY = 11000
 
