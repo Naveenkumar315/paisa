@@ -1,86 +1,24 @@
 from beanie import PydanticObjectId
 
 from app.db.models import Transaction
-
-# Fallback only. A large debit to a payee nobody has labelled is almost
-# certainly a transfer, but once the payee has a category that wins.
-TRANSFER_MIN_PAISE = 200_000
-
-# Money sent to people counts as spending. "transfer" stays its own
-# bucket so the dashboard can still say how much of the total went to
-# people; only self-transfers and credits are left out.
-SPENDING_BUCKETS = ["spending", "transfer"]
-SPENDING_MATCH = {"$match": {"bucket": {"$in": SPENDING_BUCKETS}}}
+from app.services.classification import (
+    EXPENSE,
+    INCOME,
+    REFUND,
+    SELF_TRANSFER,
+    SPENDING_MATCH,
+    SPENDING_TYPES,
+    TRANSFER_IN,
+    TRANSFER_MIN_PAISE,  # noqa: F401  re-exported for older imports
+    TRANSFER_OUT,
+    classify_stages,
+)
 
 
 def _with_category() -> list[dict]:
-    """Attach each transaction's payee category, then bucket it.
-
-    The join happens in the database. Pulling four hundred transactions
-    into Python to look up a category each would be four hundred round
-    trips for six numbers.
-    """
-    return [
-        {
-            "$lookup": {
-                "from": "payees",
-                "let": {"payee": "$counterparty_raw", "uid": "$user_id"},
-                "pipeline": [
-                    {
-                        "$match": {
-                            "$expr": {
-                                "$and": [
-                                    {"$eq": ["$name", "$$payee"]},
-                                    {"$eq": ["$user_id", "$$uid"]},
-                                ]
-                            }
-                        }
-                    },
-                    {"$project": {"category": 1, "_id": 0}},
-                ],
-                "as": "payee_doc",
-            }
-        },
-        {
-            "$addFields": {
-                "category": {"$first": "$payee_doc.category"},
-            }
-        },
-        {
-            "$addFields": {
-                "bucket": {
-                    "$switch": {
-                        "branches": [
-                            {"case": "$is_self_transfer", "then": "self"},
-                            {
-                                "case": {"$eq": ["$direction", "credit"]},
-                                "then": "received",
-                            },
-                            # A labelled transfer is a transfer whatever
-                            # the amount: lending 500 rupees is not lunch.
-                            {
-                                "case": {"$eq": ["$category", "transfer"]},
-                                "then": "transfer",
-                            },
-                            # Unlabelled and large: assume transfer.
-                            {
-                                "case": {
-                                    "$and": [
-                                        {"$eq": [
-                                            {"$type": "$category"}, "missing"]},
-                                        {"$gte": ["$amount_paise",
-                                                  TRANSFER_MIN_PAISE]},
-                                    ]
-                                },
-                                "then": "transfer",
-                            },
-                        ],
-                        "default": "spending",
-                    }
-                }
-            }
-        },
-    ]
+    """Attach each transaction's category and type. Kept under its old
+    name; the decision itself lives in services/classification.py."""
+    return classify_stages()
 
 
 async def monthly_summaries(user_id: PydanticObjectId) -> list[dict]:
@@ -93,7 +31,7 @@ async def monthly_summaries(user_id: PydanticObjectId) -> list[dict]:
                     "month": {
                         "$dateToString": {"format": "%Y-%m", "date": "$occurred_at"}
                     },
-                    "bucket": "$bucket",
+                    "txn_type": "$txn_type",
                 },
                 "total": {"$sum": "$amount_paise"},
                 "count": {"$sum": 1},
@@ -104,7 +42,7 @@ async def monthly_summaries(user_id: PydanticObjectId) -> list[dict]:
                 "_id": "$_id.month",
                 "buckets": {
                     "$push": {
-                        "bucket": "$_id.bucket",
+                        "txn_type": "$_id.txn_type",
                         "total": "$total",
                         "count": "$count",
                     }
@@ -118,19 +56,30 @@ async def monthly_summaries(user_id: PydanticObjectId) -> list[dict]:
 
     out = []
     for row in rows:
-        totals = {b["bucket"]: b for b in row["buckets"]}
-        spending = totals.get("spending", {})
-        transfer = totals.get("transfer", {})
+        by_type = {b["txn_type"]: b for b in row["buckets"]}
+
+        def total(*types: str) -> int:
+            return sum(by_type.get(t, {}).get("total", 0) for t in types)
+
+        def count(*types: str) -> int:
+            return sum(by_type.get(t, {}).get("count", 0) for t in types)
+
         out.append(
             {
                 "month": row["_id"],
                 # transfers_paise is the part of spending_paise that went
                 # to people, not an extra amount on top of it.
-                "spending_paise": spending.get("total", 0) + transfer.get("total", 0),
-                "transfers_paise": transfer.get("total", 0),
-                "received_paise": totals.get("received", {}).get("total", 0),
-                "self_transfer_paise": totals.get("self", {}).get("total", 0),
-                "txn_count": spending.get("count", 0) + transfer.get("count", 0),
+                "spending_paise": total(*SPENDING_TYPES),
+                "transfers_paise": total(TRANSFER_OUT),
+                "received_paise": total(INCOME, TRANSFER_IN, REFUND),
+                "self_transfer_paise": total(SELF_TRANSFER),
+                "txn_count": count(*SPENDING_TYPES),
+                # The same money split by type. expenses + transfers =
+                # spending; income + transfers_in + refunds = received.
+                "expenses_paise": total(EXPENSE),
+                "income_paise": total(INCOME),
+                "transfers_in_paise": total(TRANSFER_IN),
+                "refunds_paise": total(REFUND),
             }
         )
     return out
@@ -154,7 +103,7 @@ async def category_slices(user_id: PydanticObjectId, month: str) -> list[dict]:
                 "total": {"$sum": "$amount_paise"},
             }
         },
-        {"$sort": {"total": -1}},
+        {"$sort": {"total": -1, "_id": 1}},
     ]
 
     rows = await Transaction.aggregate(pipeline).to_list()
@@ -235,7 +184,7 @@ async def mobile_recharges(user_id: PydanticObjectId) -> list[dict]:
     pipeline = [
         {"$match": {"user_id": user_id}},
         *_with_category(),
-        {"$match": {"bucket": "spending", "category": "mobile"}},
+        {"$match": {"txn_type": EXPENSE, "category": "mobile"}},
         {
             "$group": {
                 "_id": {
@@ -260,11 +209,7 @@ async def payee_summaries(
 ) -> list[dict]:
     pipeline: list[dict] = [
         {
-            "$match": {
-                "user_id": user_id,
-                "direction": "debit",
-                "is_self_transfer": False,
-            }
+            "$match": {"user_id": user_id, "direction": "debit"}
         },
     ]
     if month:
@@ -279,6 +224,7 @@ async def payee_summaries(
         ]
     pipeline += [
         *_with_category(),
+        SPENDING_MATCH,
         {
             "$group": {
                 "_id": "$counterparty_raw",
@@ -287,7 +233,7 @@ async def payee_summaries(
                 "count": {"$sum": 1},
             }
         },
-        {"$sort": {"count": -1, "total_paise": -1}},
+        {"$sort": {"count": -1, "total_paise": -1, "_id": 1}},
         {"$limit": limit},
     ]
 
@@ -372,7 +318,7 @@ async def people_balances(user_id: PydanticObjectId) -> list[dict]:
         # pay is not a balance, it is spending.
         {"$match": {"paid_count": {"$gt": 0}, "received_count": {"$gt": 0}}},
         {"$addFields": {"net": {"$subtract": ["$received", "$paid"]}}},
-        {"$sort": {"paid": -1}},
+        {"$sort": {"paid": -1, "_id": 1}},
     ]
 
     rows = await Transaction.aggregate(pipeline).to_list()

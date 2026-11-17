@@ -12,7 +12,7 @@ from typing import Any, Awaitable, Callable
 from beanie import PydanticObjectId
 
 from app.db.models import Transaction
-from app.services.analytics_service import SPENDING_MATCH, _with_category
+from app.services.classification import SPENDING_MATCH, classify_stages as _with_category
 from app.services.categorize_service import CATEGORIES
 
 logger = logging.getLogger("moneytrail")
@@ -225,16 +225,18 @@ async def get_payee_total(
             "$match": {
                 "user_id": user_id,
                 "direction": "debit",
-                "is_self_transfer": False,
                 # The user types "jio", the statement says "Jio Prepaid".
                 # Anchoring on an exact name would answer "nothing found"
-                # to a question that has an obvious answer.
-                "counterparty_raw": {"$regex": name, "$options": "i"},
+                # to a question that has an obvious answer. Escaped: the
+                # name is text to find, not a pattern the model can write.
+                "counterparty_raw": {"$regex": re.escape(name), "$options": "i"},
             }
         },
     ]
     if month:
         pipeline += [_month_field(), {"$match": {"month": month}}]
+    # Same definition of "paid" as every other total.
+    pipeline += [*_with_category(), SPENDING_MATCH]
     pipeline.append(
         {
             "$group": {
@@ -244,7 +246,7 @@ async def get_payee_total(
             }
         }
     )
-    pipeline.append({"$sort": {"total": -1}})
+    pipeline.append({"$sort": {"total": -1, "_id": 1}})
 
     rows = await Transaction.aggregate(pipeline).to_list()
     if not rows:
@@ -324,7 +326,7 @@ async def top_payees(
                 "count": {"$sum": 1},
             }
         },
-        {"$sort": {"total": -1}},
+        {"$sort": {"total": -1, "_id": 1}},
         {"$limit": min(limit, 20)},
     ]
 
@@ -363,7 +365,6 @@ async def find_payments(
     match: dict = {
         "user_id": user_id,
         "direction": "debit",
-        "is_self_transfer": False,
         "amount_paise": {
             "$gte": round(min_rupees * 100),
             "$lte": round(max_rupees * 100),
@@ -375,6 +376,7 @@ async def find_payments(
     pipeline: list[dict] = [{"$match": match}, _month_field()]
     if month:
         pipeline.append({"$match": {"month": month}})
+    pipeline += [*_with_category(), SPENDING_MATCH]
     pipeline += [
         {
             "$group": {

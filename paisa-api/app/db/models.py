@@ -23,12 +23,50 @@ class User(Document):
         ]
 
 
+class Account(Document):
+    """One of the person's own accounts, as a statement names it.
+
+    A Google Pay statement says which bank account each payment used
+    ("Axis Bank 1714") but never what is in it, so there is no balance
+    here. Balances arrive with a bank-statement importer, not before.
+    """
+
+    user_id: PydanticObjectId
+    institution: str                # "Axis Bank"
+    last4: str
+    name: str                       # the person's nickname, defaults to "Axis Bank ··1714"
+    account_type: str = "bank"      # see accounts_service.ACCOUNT_TYPES
+    currency: str = "INR"
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=utcnow)
+
+    class Settings:
+        name = "accounts"
+        indexes = [
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING),
+                 ("institution", pymongo.ASCENDING),
+                 ("last4", pymongo.ASCENDING)],
+                unique=True,
+            ),
+        ]
+
+
 class Transaction(Document):
     """One payment.
 
     amount_paise, not a float. 171.25 in binary floating point is
     171.2499999999999943..., and summing 400 of those drifts away from
     the statement total. Integers of the smallest unit never drift.
+
+    occurred_at is the statement's own wall-clock time (IST) with no
+    timezone, and every query buckets it the same way. Do not add a
+    timezone to one query without changing them all.
+
+    What a transaction *is* (expense, transfer, refund...) is not stored:
+    services/classification.py works it out on every query, so a payee
+    relabelled today is right in every past month too. Only the person's
+    own overrides are stored.
     """
 
     user_id: PydanticObjectId
@@ -42,6 +80,16 @@ class Transaction(Document):
     account_last4: str = ""
     created_at: datetime = Field(default_factory=utcnow)
 
+    # Added in Sprint 1. Optional, so documents written before stay valid;
+    # migrations backfill what can be backfilled.
+    payee_key: str | None = None            # payee_normalize.normalize_name(counterparty_raw)
+    statement_id: PydanticObjectId | None = None   # None for imports made before it was stored
+    account_id: PydanticObjectId | None = None
+    type_override: str | None = None        # set by the person; see classification.ALL_TYPES
+    category_override: str | None = None
+    notes: str | None = None
+    updated_at: datetime | None = None
+
     class Settings:
         name = "transactions"
         indexes = [
@@ -54,6 +102,14 @@ class Transaction(Document):
             pymongo.IndexModel(
                 [("user_id", pymongo.ASCENDING),
                  ("occurred_at", pymongo.DESCENDING)]
+            ),
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING),
+                 ("account_id", pymongo.ASCENDING),
+                 ("occurred_at", pymongo.DESCENDING)]
+            ),
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING), ("statement_id", pymongo.ASCENDING)]
             ),
         ]
 
@@ -70,8 +126,31 @@ class Statement(Document):
     rows_duplicate: int = 0
     imported_at: datetime = Field(default_factory=utcnow)
 
+    # Added in Sprint 1.
+    # sha256 of the uploaded bytes. Cleared if the import fails, so the
+    # same file can be tried again.
+    file_hash: str | None = None
+    status: str = "completed"       # "processing" | "completed" | "failed"
+    rows_failed: int = 0            # payment lines the parser saw but could not read
+    total_debit_paise: int | None = None
+    total_credit_paise: int | None = None
+
     class Settings:
         name = "statements"
+        indexes = [
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING), ("imported_at", pymongo.DESCENDING)]
+            ),
+            # The same file twice is refused by the database, not by a
+            # check-then-insert two concurrent uploads would both pass.
+            # Partial, because statements from before Sprint 1 have no hash.
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING), ("file_hash", pymongo.ASCENDING)],
+                unique=True,
+                partialFilterExpression={"file_hash": {"$type": "string"}},
+                name="user_file_hash_unique",
+            ),
+        ]
 
 
 class Payee(Document):
@@ -86,6 +165,9 @@ class Payee(Document):
     category: str | None = None
     source: str | None = None       # "llm" | "user"
     created_at: datetime = Field(default_factory=utcnow)
+    # Transactions join on this, not on name, so spellings that differ
+    # only in case or spacing share one category.
+    normalized_name: str | None = None
 
     class Settings:
         name = "payees"
@@ -94,7 +176,44 @@ class Payee(Document):
                 [("user_id", pymongo.ASCENDING), ("name", pymongo.ASCENDING)],
                 unique=True,
             ),
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING), ("normalized_name", pymongo.ASCENDING)]
+            ),
         ]
+
+
+class AuditLog(Document):
+    """Who changed what on a financial record, and from what to what."""
+
+    user_id: PydanticObjectId
+    entity: str                     # "transaction" | "account"
+    entity_id: PydanticObjectId
+    action: str                     # "update"
+    changes: dict[str, Any]         # {"field": [old, new]}
+    created_at: datetime = Field(default_factory=utcnow)
+
+    class Settings:
+        name = "audit_logs"
+        indexes = [
+            pymongo.IndexModel(
+                [("user_id", pymongo.ASCENDING),
+                 ("entity", pymongo.ASCENDING),
+                 ("entity_id", pymongo.ASCENDING),
+                 ("created_at", pymongo.DESCENDING)]
+            ),
+        ]
+
+
+class MigrationRecord(Document):
+    """One applied data migration. See app/db/migrations."""
+
+    name: str
+    applied_at: datetime = Field(default_factory=utcnow)
+    result: dict[str, Any] = Field(default_factory=dict)
+
+    class Settings:
+        name = "migrations"
+        indexes = [pymongo.IndexModel([("name", pymongo.ASCENDING)], unique=True)]
 
 
 class AgentRun(Document):
@@ -144,4 +263,7 @@ class AgentStep(Document):
         ]
 
 
-DOCUMENT_MODELS = [User, Statement, Transaction, Payee, AgentRun, AgentStep]
+DOCUMENT_MODELS = [
+    User, Account, Statement, Transaction, Payee,
+    AuditLog, MigrationRecord, AgentRun, AgentStep,
+]

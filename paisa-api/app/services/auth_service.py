@@ -33,7 +33,9 @@ async def authenticate(data: LoginIn) -> User:
     # Same message whether the email is missing or the password is wrong.
     # Otherwise the endpoint tells an attacker which emails exist.
     if user is None or not verify_password(data.password, user.password_hash):
-        logger.warning("login_failed email=%s", data.email)
+        # No email in the log: a failed login is often a mistyped address,
+        # which is someone's personal data with no account behind it.
+        logger.warning("login_failed")
         raise Unauthorized("Invalid email or password")
 
     logger.info("login_success id=%s", user.id)

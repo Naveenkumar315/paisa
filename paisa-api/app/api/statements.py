@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 
 from app.api.deps import get_current_user
+from app.core.config import settings
 from app.db.models import Statement, Transaction, User
 from app.schemas.statements import StatementOut, TransactionOut, TransactionPage
 from app.services import categorize_service, import_service
@@ -22,6 +23,10 @@ def _out(s: Statement) -> StatementOut:
         rows_inserted=s.rows_inserted,
         rows_duplicate=s.rows_duplicate,
         imported_at=s.imported_at,
+        rows_failed=s.rows_failed,
+        status=s.status,
+        total_debit_paise=s.total_debit_paise,
+        total_credit_paise=s.total_credit_paise,
     )
 
 
@@ -30,7 +35,9 @@ async def upload_statement(
     file: UploadFile = File(...),
     user: User = Depends(get_current_user),
 ):
-    data = await file.read()
+    # Read one byte past the limit, not the whole body: enough to know
+    # the file is too big without holding all of it in memory.
+    data = await file.read(settings.max_upload_mb * 1024 * 1024 + 1)
     statement = await import_service.import_statement(
         user.id, file.filename or "statement.pdf", data
     )

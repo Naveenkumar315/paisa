@@ -1,5 +1,6 @@
 import logging
 
+from bson.errors import InvalidId
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -38,6 +39,14 @@ def register_error_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=exc.status_code,
             content={"error": {"code": exc.code, "message": exc.message}},
+        )
+
+    @app.exception_handler(InvalidId)
+    async def handle_bad_id(request: Request, exc: InvalidId):
+        # A malformed id in a path is the caller's mistake, not a crash.
+        return JSONResponse(
+            status_code=400,
+            content={"error": {"code": "invalid_id", "message": "That id is not valid"}},
         )
 
     @app.exception_handler(Exception)

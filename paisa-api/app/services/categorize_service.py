@@ -2,9 +2,11 @@ import logging
 from collections import defaultdict
 
 from beanie import PydanticObjectId
+from pymongo.errors import DuplicateKeyError
 
 from app.db.models import Payee, Transaction
 from app.services.llm import complete_json
+from app.services.payee_normalize import normalize_name
 
 logger = logging.getLogger("moneytrail")
 
@@ -13,22 +15,6 @@ CATEGORIES = [
     "health", "shopping", "transfer", "other",
 ]
 
-MERCHANT_WORDS = {
-    "food": ["cafe", "hotel", "mess", "tiffen", "tiffin", "briyani",
-             "bakery", "sweet", "juice", "lassi", "cool bar", "chai"],
-    "travel": ["motors", "automobiles", "fuels", "petrol", "service station",
-               "transport", "metro", "lorry"],
-    "groceries": ["store", "supermart", "agencies", "traders", "mart"],
-    "health": ["medicals", "clinic", "hospital", "pharmacy"],
-    "mobile": ["jio", "airtel", "prepaid"],
-}
-
-def by_name(payee: str) -> str | None:
-    low = payee.lower()
-    for category, words in MERCHANT_WORDS.items():
-        if any(w in low for w in words):
-            return category
-    return None
 # Small enough that the model stays accurate, large enough that 164
 # payees take a handful of calls rather than 164.
 BATCH = 40
@@ -69,8 +55,14 @@ Return ONLY JSON in this shape:
 """
 
 
-async def _payee_stats(user_id: PydanticObjectId) -> dict[str, dict]:
-    """Both directions. Money coming back is a signal the model needs."""
+async def _payee_stats(user_id: PydanticObjectId) -> tuple[dict[str, dict], dict[str, str]]:
+    """Both directions. Money coming back is a signal the model needs.
+
+    Grouped by normalised payee, so two spellings of one shop are one
+    line in the prompt with their payments added together. Returns the
+    stats keyed by a display name (the first spelling seen) and a map
+    from that display name to the payee key.
+    """
     stats: dict[str, dict] = defaultdict(
         lambda: {
             "count": 0,
@@ -80,11 +72,14 @@ async def _payee_stats(user_id: PydanticObjectId) -> dict[str, dict]:
             "received_count": 0,
         }
     )
+    display: dict[str, str] = {}    # key -> display name
     async for t in Transaction.find(
         Transaction.user_id == user_id,
         Transaction.is_self_transfer == False,  # noqa: E712
     ):
-        s = stats[t.counterparty_raw]
+        key = t.payee_key or normalize_name(t.counterparty_raw)
+        name = display.setdefault(key, t.counterparty_raw)
+        s = stats[name]
         if t.direction == "credit":
             s["received"] += t.amount_paise
             s["received_count"] += 1
@@ -92,7 +87,7 @@ async def _payee_stats(user_id: PydanticObjectId) -> dict[str, dict]:
             s["count"] += 1
             s["total"] += t.amount_paise
             s["hours"].append(t.occurred_at.hour)
-    return stats
+    return stats, {name: key for key, name in display.items()}
 
 
 def _describe(name: str, s: dict) -> str:
@@ -131,14 +126,17 @@ async def categorize_all(user_id: PydanticObjectId, only_new: bool = False) -> d
     cost no model calls. The Re-run button passes False to revisit every
     payee the person has not labelled themselves.
     """
-    stats = await _payee_stats(user_id)
+    stats, keys = await _payee_stats(user_id)
 
     # Never re-ask about a payee the person has already labelled.
     existing = await Payee.find(Payee.user_id == user_id).to_list()
-    decided = {p.name for p in existing if p.source == "user"}
-    skip = {p.name for p in existing} if only_new else decided
+    known_keys = {p.normalized_name or normalize_name(p.name) for p in existing}
+    decided_keys = {
+        p.normalized_name or normalize_name(p.name) for p in existing if p.source == "user"
+    }
+    skip = known_keys if only_new else decided_keys
 
-    todo = [n for n in stats if n not in skip]
+    todo = [n for n in stats if keys[n] not in skip]
     logger.info("categorising %s payees", len(todo))
 
     results: dict[str, str] = {}
@@ -157,19 +155,30 @@ async def categorize_all(user_id: PydanticObjectId, only_new: bool = False) -> d
                 results[name] = category
         logger.info("categorised %s/%s", len(results), len(todo))
 
+    payees = Payee.get_pymongo_collection()
     for name, category in results.items():
-        payee = await Payee.find_one(Payee.user_id == user_id, Payee.name == name)
-        if payee is None:
+        key = keys[name]
+        if key in known_keys:
+            # Every spelling of the payee, except ones the person labelled.
+            await payees.update_many(
+                {"user_id": user_id, "normalized_name": key, "source": {"$ne": "user"}},
+                {"$set": {"category": category, "source": "llm"}},
+            )
+            continue
+        try:
             await Payee(
-                user_id=user_id, name=name, category=category, source="llm"
+                user_id=user_id, name=name, normalized_name=key,
+                category=category, source="llm",
             ).insert()
-        elif payee.source != "user":
-            payee.category = category
-            payee.source = "llm"
-            await payee.save()
+        except DuplicateKeyError:
+            # A concurrent run inserted it first; label it the same way.
+            await payees.update_one(
+                {"user_id": user_id, "name": name, "source": {"$ne": "user"}},
+                {"$set": {"category": category, "source": "llm"}},
+            )
 
     return {
         "payees_seen": len(stats),
         "categorised": len(results),
-        "kept_from_user": len(decided),
+        "kept_from_user": len(decided_keys),
     }

@@ -5,6 +5,7 @@ from app.api.deps import get_current_user
 from app.core.errors import AppError, NotFound
 from app.db.models import Payee, User
 from app.services import categorize_service
+from app.services.payee_normalize import normalize_name
 
 router = APIRouter(prefix="/payees", tags=["payees"])
 
@@ -43,7 +44,12 @@ async def set_category(
     if payee is None:
         raise NotFound(f"No payee named {name}")
 
-    payee.category = body.category
-    payee.source = "user"      # from now on the model leaves this alone
-    await payee.save()
-    return PayeeOut(name=payee.name, category=payee.category, source=payee.source)
+    # Every spelling of this payee gets the label, so the same shop
+    # written in a different case cannot keep the model's old guess.
+    key = payee.normalized_name or normalize_name(payee.name)
+    await Payee.get_pymongo_collection().update_many(
+        {"user_id": user.id, "normalized_name": key},
+        # From now on the model leaves these alone.
+        {"$set": {"category": body.category, "source": "user"}},
+    )
+    return PayeeOut(name=payee.name, category=body.category, source="user")

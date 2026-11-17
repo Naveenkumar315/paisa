@@ -12,6 +12,10 @@ class StatementOut(BaseModel):
     rows_inserted: int
     rows_duplicate: int
     imported_at: datetime
+    rows_failed: int = 0
+    status: str = "completed"
+    total_debit_paise: int | None = None
+    total_credit_paise: int | None = None
 
 
 class TransactionOut(BaseModel):

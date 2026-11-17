@@ -45,14 +45,31 @@ def to_paise(raw: str) -> int:
     return int(Decimal(raw.replace(",", "")) * 100)
 
 
+@dataclass(frozen=True)
+class ParseReport:
+    rows: list[ParsedTxn]
+    # Payment lines that matched the header but had no readable time and
+    # transaction id after them. Counted, never guessed at: without a
+    # transaction id the row cannot be deduplicated.
+    skipped: int
+
+
 def parse_statement(path: str) -> list[ParsedTxn]:
+    return parse_statement_report(path).rows
+
+
+def parse_statement_report(path: str) -> ParseReport:
     lines: list[str] = []
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
             text = page.extract_text(x_tolerance=X_TOLERANCE) or ""
             lines.extend(line.strip() for line in text.splitlines())
+    return parse_lines(lines)
 
+
+def parse_lines(lines: list[str]) -> ParseReport:
     rows: list[ParsedTxn] = []
+    skipped = 0
     for i, line in enumerate(lines):
         head = HEADER.match(line)
         if not head:
@@ -61,9 +78,15 @@ def parse_statement(path: str) -> list[ParsedTxn]:
         # The time, id and account sit on the next two or three lines.
         detail = account = None
         for nxt in lines[i + 1: i + 4]:
+            # Stop at the next payment. Reading past it would hand this
+            # row the next payment's transaction id; the dedupe would
+            # then keep this wrong row and drop the real one.
+            if HEADER.match(nxt):
+                break
             detail = detail or DETAIL.match(nxt)
             account = account or ACCOUNT.match(nxt)
         if detail is None:
+            skipped += 1
             continue
 
         kind = head.group("kind")
@@ -83,4 +106,4 @@ def parse_statement(path: str) -> list[ParsedTxn]:
             )
         )
 
-    return rows
+    return ParseReport(rows=rows, skipped=skipped)
