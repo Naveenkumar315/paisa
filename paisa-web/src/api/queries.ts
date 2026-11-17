@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import * as accounts from "./accounts";
 import * as analytics from "./analytics";
 import * as statements from "./statements";
+import * as transactions from "./transactions";
+import type { TransactionQuery } from "./transactions";
 
 /**
  * Every key in one place. A typo in a key string is invisible — the query
@@ -17,6 +20,8 @@ export const keys = {
     statements: ["statements"] as const,
     transactions: (limit: number, offset: number) =>
         ["transactions", limit, offset] as const,
+    transactionList: (q: TransactionQuery) => ["transaction-list", q] as const,
+    accounts: ["accounts"] as const,
 };
 
 export function useMonths() {
@@ -67,6 +72,38 @@ export function useTransactions(limit = 50, offset = 0) {
         queryKey: keys.transactions(limit, offset),
         queryFn: () => statements.listTransactions(limit, offset),
         placeholderData: (previous) => previous,
+    });
+}
+
+export function useTransactionList(query: TransactionQuery) {
+    return useQuery({
+        queryKey: keys.transactionList(query),
+        queryFn: () => transactions.listTransactions(query),
+        placeholderData: (previous) => previous,
+    });
+}
+
+export function useUpdateTransaction() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, patch }: { id: string; patch: transactions.TransactionPatch }) =>
+            transactions.updateTransaction(id, patch),
+        // An override moves money between types and categories, which
+        // every total on every screen reads.
+        onSuccess: () => qc.invalidateQueries(),
+    });
+}
+
+export function useAccounts() {
+    return useQuery({ queryKey: keys.accounts, queryFn: accounts.listAccounts });
+}
+
+export function useUpdateAccount() {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, patch }: { id: string; patch: Parameters<typeof accounts.updateAccount>[1] }) =>
+            accounts.updateAccount(id, patch),
+        onSuccess: () => qc.invalidateQueries({ queryKey: keys.accounts }),
     });
 }
 

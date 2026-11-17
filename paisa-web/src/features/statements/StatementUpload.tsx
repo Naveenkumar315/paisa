@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -28,7 +29,20 @@ export default function StatementUpload({
                     ? `Imported ${result.rows_inserted} payments`
                     : `Already imported — ${result.rows_duplicate} payments skipped`
             );
+            if (result.rows_failed) {
+                // Said out loud: a line we could not read is a payment
+                // missing from every total.
+                toast.error(
+                    `${result.rows_failed} payment line${result.rows_failed === 1 ? "" : "s"} could not be read and ${result.rows_failed === 1 ? "was" : "were"} not imported`,
+                    { duration: 8000 }
+                );
+            }
         } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 409) {
+                // The exact same file again. Nothing went wrong; nothing changed.
+                toast(errorMessage(err));
+                return;
+            }
             toast.error(errorMessage(err));
         } finally {
             // Clearing lets the same file be picked again after a failure.

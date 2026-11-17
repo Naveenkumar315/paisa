@@ -13,6 +13,8 @@ import DashboardPage from "./features/dashboard/DashboardPage";
 import AskPage from "./features/ask/AskPage";
 import PayeesPage from "./features/payees/PayeesPage";
 import PeoplePage from "./features/people/PeoplePage";
+import TransactionsPage from "./features/transactions/TransactionsPage";
+import AccountsPage from "./features/accounts/AccountsPage";
 // import AskPage from "./features/ask/AskPage";
 // import PayeesPage from "./features/payees/PayeesPage";
 // import PeoplePage from "./features/people/PeoplePage";
@@ -29,6 +31,8 @@ export const router = createBrowserRouter(
         <Route element={<AppShell />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/ask" element={<AskPage />} />
           <Route path="/payees" element={<PayeesPage />} />
           <Route path="/people" element={<PeoplePage />} />

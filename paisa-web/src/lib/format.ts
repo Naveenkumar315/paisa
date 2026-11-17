@@ -35,6 +35,19 @@ export function shortDate(iso: string): string {
     return day.format(new Date(iso));
 }
 
+const dayYear = new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+const clock = new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit" });
+
+/** "10 Sep 2026" */
+export function fullDate(iso: string): string {
+    return dayYear.format(new Date(iso));
+}
+
+/** "9:30 am" */
+export function timeOfDay(iso: string): string {
+    return clock.format(new Date(iso));
+}
+
 export function monthLabel(iso: string): string {
     return monthYear.format(new Date(iso));
 }

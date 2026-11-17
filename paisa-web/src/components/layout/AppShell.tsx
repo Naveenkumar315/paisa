@@ -6,6 +6,8 @@ import ThemeToggle from "../ui/ThemeToggle";
 
 const links = [
     { to: "/dashboard", label: "Dashboard" },
+    { to: "/transactions", label: "Transactions" },
+    { to: "/accounts", label: "Accounts" },
     { to: "/ask", label: "Ask" },
     { to: "/payees", label: "Payees" },
     { to: "/people", label: "People" },
